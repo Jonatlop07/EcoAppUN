@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 
+	"github.com/Jonatlop07/EcoAppUN/server/users"
 	"github.com/gin-gonic/gin"
 	"github.com/google/wire"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -10,18 +11,18 @@ import (
 
 type AppDependencies struct {
 	Database       *mongo.Database
-	UserController *UserController
+	UserController *users.UserController
 }
 
-func provideUserController(database *mongo.Database) *UserController {
-	return &UserController{
+func provideUserController(database *mongo.Database) *users.UserController {
+	return &users.UserController{
 		Collection: database.Collection("users"),
 	}
 }
 
 func InitializeAppDependencies() (*AppDependencies, error) {
 	wire.Build(
-		setupDatabase,
+		database.setupDatabase,
 		provideUserController,
 		wire.Struct(new(AppDependencies), "*"),
 	)
