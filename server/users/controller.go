@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -13,14 +14,8 @@ type UserController struct {
 	Collection *mongo.Collection
 }
 
-func NewUserController(database *mongo.Database) *UserController {
-	return &UserController{
-		Collection: database.Collection("users"),
-	}
-}
-
 func (uc *UserController) GetUsers(c *gin.Context) {
-	var users []bson.M
+	var users []User
 	cursor, err := uc.Collection.Find(context.TODO(), bson.M{})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -28,7 +23,7 @@ func (uc *UserController) GetUsers(c *gin.Context) {
 	}
 	defer cursor.Close(context.TODO())
 	for cursor.Next(context.TODO()) {
-		var user bson.M
+		var user User
 		err := cursor.Decode(&user)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -40,8 +35,13 @@ func (uc *UserController) GetUsers(c *gin.Context) {
 }
 
 func (uc *UserController) CreateUser(c *gin.Context) {
-	var newUser bson.M
+	var newUser User
 	if err := c.ShouldBindJSON(&newUser); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	validate := validator.New()
+	if err := validate.Struct(newUser); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
@@ -55,7 +55,7 @@ func (uc *UserController) CreateUser(c *gin.Context) {
 
 func (uc *UserController) GetUserByID(c *gin.Context) {
 	userID := c.Param("id")
-	var user bson.M
+	var user User
 	err := uc.Collection.FindOne(context.TODO(), bson.M{"_id": userID}).Decode(&user)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {

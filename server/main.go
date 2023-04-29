@@ -1,13 +1,13 @@
 package main
 
 import (
+	"eco-app/rest-service/db"
+	"eco-app/rest-service/users"
 	"log"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/wire"
 	"go.mongodb.org/mongo-driver/mongo"
-
-	"github.com/Jonatlop07/EcoAppUN/server/users"
 )
 
 type AppDependencies struct {
@@ -23,7 +23,7 @@ func provideUserController(database *mongo.Database) *users.UserController {
 
 func InitializeAppDependencies() (*AppDependencies, error) {
 	wire.Build(
-		db.setupDatabase,
+		db.SetupDatabase,
 		provideUserController,
 		wire.Struct(new(AppDependencies), "*"),
 	)
@@ -33,10 +33,7 @@ func InitializeAppDependencies() (*AppDependencies, error) {
 func setupRouter(appDependencies *AppDependencies) *gin.Engine {
 	userController := appDependencies.UserController
 	router := gin.Default()
-	router.GET("/users", userController.GetUsers)
-	router.POST("/users", userController.CreateUser)
-	router.GET("/users/:id", userController.GetUserByID)
-	router.DELETE("/users/:id", userController.DeleteUser)
+	users.SetupUserRoutes(router, userController)
 	return router
 }
 
