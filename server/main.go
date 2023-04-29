@@ -15,16 +15,11 @@ type AppDependencies struct {
 	UserController *users.UserController
 }
 
-func provideUserController(database *mongo.Database) *users.UserController {
-	return &users.UserController{
-		Collection: database.Collection("users"),
-	}
-}
-
 func InitializeAppDependencies() (*AppDependencies, error) {
 	wire.Build(
 		db.SetupDatabase,
-		provideUserController,
+		users.ProvideUserRepository,
+		users.ProvideUserController,
 		wire.Struct(new(AppDependencies), "*"),
 	)
 	return &AppDependencies{}, nil
