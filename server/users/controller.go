@@ -12,57 +12,57 @@ type UserController struct {
 	Gateway UserRepository
 }
 
-func (uc *UserController) GetUsers(c *gin.Context) {
-	users, err := uc.Gateway.GetAll()
+func (userController *UserController) GetUsers(ctx *gin.Context) {
+	users, err := userController.Gateway.GetAll()
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, users)
+	ctx.JSON(http.StatusOK, users)
 }
 
-func (uc *UserController) CreateUser(c *gin.Context) {
+func (userController *UserController) CreateUser(ctx *gin.Context) {
 	var newUser User
-	if err := c.ShouldBindJSON(&newUser); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	if err := ctx.ShouldBindJSON(&newUser); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 	validate := validator.New()
 	if err := validate.Struct(newUser); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	err := uc.Gateway.Create(newUser)
+	err := userController.Gateway.Create(newUser)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.Status(http.StatusCreated)
+	ctx.Status(http.StatusCreated)
 }
 
-func (uc *UserController) GetUserByID(c *gin.Context) {
-	userID := c.Param("id")
-	user, err := uc.Gateway.GetByID(userID)
+func (userController *UserController) GetUserByID(ctx *gin.Context) {
+	userID := ctx.Param("id")
+	user, err := userController.Gateway.GetByID(userID)
 	if err != nil {
 		if errors.Is(err, ErrUserNotFound) {
-			c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+			ctx.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
 		} else {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		}
 		return
 	}
 
-	c.JSON(http.StatusOK, user)
+	ctx.JSON(http.StatusOK, user)
 }
 
-func (uc *UserController) DeleteUser(c *gin.Context) {
-	userID := c.Param("id")
-	err := uc.Gateway.Delete(userID)
+func (userController *UserController) DeleteUser(ctx *gin.Context) {
+	userID := ctx.Param("id")
+	err := userController.Gateway.Delete(userID)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.Status(http.StatusNoContent)
+	ctx.Status(http.StatusNoContent)
 }
 
 func ProvideUserController(userRepository UserRepository) *UserController {
