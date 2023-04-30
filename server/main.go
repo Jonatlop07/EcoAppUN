@@ -2,6 +2,7 @@ package main
 
 import (
 	"eco-app/rest-service/db"
+	"eco-app/rest-service/denouncements"
 	"eco-app/rest-service/users"
 	"log"
 
@@ -11,8 +12,9 @@ import (
 )
 
 type AppDependencies struct {
-	Database       *mongo.Database
-	UserController *users.UserController
+	Database               *mongo.Database
+	UserController         *users.UserController
+	DenouncementController *denouncements.DenouncementController
 }
 
 func InitializeAppDependencies() (*AppDependencies, error) {
@@ -20,6 +22,8 @@ func InitializeAppDependencies() (*AppDependencies, error) {
 		db.SetupDatabase,
 		users.ProvideUserRepository,
 		users.ProvideUserController,
+		denouncements.ProvideDenouncementRepository,
+		denouncements.ProvideDenouncementController,
 		wire.Struct(new(AppDependencies), "*"),
 	)
 	return &AppDependencies{}, nil
@@ -27,8 +31,10 @@ func InitializeAppDependencies() (*AppDependencies, error) {
 
 func setupRouter(appDependencies *AppDependencies) *gin.Engine {
 	userController := appDependencies.UserController
+	denouncementController := appDependencies.DenouncementController
 	router := gin.Default()
 	users.SetupUserRoutes(router, userController)
+	denouncements.SetupDenouncementsRoutes(router, denouncementController)
 	return router
 }
 
