@@ -59,7 +59,7 @@ func (denouncementController *DenouncementController) DeleteDenouncement(ctx *gi
 
 func (denouncementController *DenouncementController) GetDenouncementByID(ctx *gin.Context) {
 	denouncementID := ctx.Param("id")
-	denouncement, err := denouncementController.Gateway.FindByID(denouncementID)
+	denouncement, err := denouncementController.Gateway.GetByID(denouncementID)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
 			ctx.JSON(http.StatusNotFound, gin.H{"error": "Denouncement not found"})
@@ -72,7 +72,7 @@ func (denouncementController *DenouncementController) GetDenouncementByID(ctx *g
 }
 
 func (denouncementController *DenouncementController) GetAllDenouncements(ctx *gin.Context) {
-	denouncements, err := denouncementController.Gateway.FindAll()
+	denouncements, err := denouncementController.Gateway.GetAll()
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

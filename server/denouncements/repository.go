@@ -15,8 +15,8 @@ type DenouncementRepository interface {
 	CreateResponse(*Response) error
 	CreateCommentReaction(*CommentReaction) error
 	CreateResponseReaction(*ResponseReaction) error
-	FindByID(string) (*Denouncement, error)
-	FindAll() ([]*Denouncement, error)
+	GetByID(string) (*Denouncement, error)
+	GetAll() ([]*Denouncement, error)
 	Update(*Denouncement) error
 	Delete(string) error
 	DeleteComment(*Comment) error
@@ -57,7 +57,7 @@ func (r *MongoDBDenouncementRepository) Delete(id string) error {
 	return nil
 }
 
-func (r *MongoDBDenouncementRepository) FindByID(id string) (*Denouncement, error) {
+func (r *MongoDBDenouncementRepository) GetByID(id string) (*Denouncement, error) {
 	var denouncement Denouncement
 	err := r.DenouncementsCollection.FindOne(context.TODO(), bson.M{"_id": id}).Decode(&denouncement)
 	if err != nil {
@@ -66,7 +66,7 @@ func (r *MongoDBDenouncementRepository) FindByID(id string) (*Denouncement, erro
 	return &denouncement, nil
 }
 
-func (r *MongoDBDenouncementRepository) FindAll() ([]*Denouncement, error) {
+func (r *MongoDBDenouncementRepository) GetAll() ([]*Denouncement, error) {
 	var denouncements []*Denouncement
 	cur, err := r.DenouncementsCollection.Find(context.TODO(), bson.M{})
 	if err != nil {

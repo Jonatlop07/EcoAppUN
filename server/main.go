@@ -3,7 +3,8 @@ package main
 import (
 	"eco-app/rest-service/db"
 	denouncement "eco-app/rest-service/denouncements"
-	"eco-app/rest-service/users"
+	ecotour "eco-app/rest-service/ecotours"
+	user "eco-app/rest-service/users"
 	"log"
 
 	"github.com/gin-gonic/gin"
@@ -13,17 +14,20 @@ import (
 
 type AppDependencies struct {
 	Database               *mongo.Database
-	UserController         *users.UserController
+	UserController         *user.UserController
 	DenouncementController *denouncement.DenouncementController
+	EcotourController      *ecotour.EcotourController
 }
 
 func InitializeAppDependencies() (*AppDependencies, error) {
 	wire.Build(
 		db.SetupDatabase,
-		users.ProvideUserRepository,
-		users.ProvideUserController,
+		user.ProvideUserRepository,
+		user.ProvideUserController,
 		denouncement.ProvideDenouncementRepository,
 		denouncement.ProvideDenouncementController,
+		ecotour.ProvideEcotourRepository,
+		ecotour.ProvideEcotourController,
 		wire.Struct(new(AppDependencies), "*"),
 	)
 	return &AppDependencies{}, nil
@@ -32,9 +36,11 @@ func InitializeAppDependencies() (*AppDependencies, error) {
 func setupRouter(appDependencies *AppDependencies) *gin.Engine {
 	userController := appDependencies.UserController
 	denouncementController := appDependencies.DenouncementController
+	ecotourController := appDependencies.EcotourController
 	router := gin.Default()
-	users.SetupUserRoutes(router, userController)
+	user.SetupUserRoutes(router, userController)
 	denouncement.SetupDenouncementRoutes(router, denouncementController)
+	ecotour.SetupEcotourRoutes(router, ecotourController)
 	return router
 }
 
