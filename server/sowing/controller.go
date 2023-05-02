@@ -120,7 +120,7 @@ func (controller *SowingWorkshopController) UpdateObjectives(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, updatedObjectives)
 }
 
-func ProvideEcotourController(sowingWorkshopRepository SowingWorkshopRepository) *SowingWorkshopController {
+func ProvideSowingController(sowingWorkshopRepository SowingWorkshopRepository) *SowingWorkshopController {
 	return &SowingWorkshopController{
 		Gateway: sowingWorkshopRepository,
 	}

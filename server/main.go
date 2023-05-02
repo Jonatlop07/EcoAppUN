@@ -2,9 +2,11 @@ package main
 
 import (
 	"eco-app/rest-service/db"
-	denouncement "eco-app/rest-service/denouncements"
-	ecotour "eco-app/rest-service/ecotours"
-	user "eco-app/rest-service/users"
+	denouncement "eco-app/rest-service/denouncement"
+	ecorecovery "eco-app/rest-service/ecorecovery"
+	ecotour "eco-app/rest-service/ecotour"
+	sowing "eco-app/rest-service/sowing"
+	user "eco-app/rest-service/user"
 	"log"
 
 	"github.com/gin-gonic/gin"
@@ -13,10 +15,12 @@ import (
 )
 
 type AppDependencies struct {
-	Database               *mongo.Database
-	UserController         *user.UserController
-	DenouncementController *denouncement.DenouncementController
-	EcotourController      *ecotour.EcotourController
+	Database                      *mongo.Database
+	UserController                *user.UserController
+	DenouncementController        *denouncement.DenouncementController
+	EcotourController             *ecotour.EcotourController
+	SowingWorkshopController      *sowing.SowingWorkshopController
+	EcorecoveryWorkshopController *ecorecovery.EcorecoveryWorkshopController
 }
 
 func InitializeAppDependencies() (*AppDependencies, error) {
@@ -28,6 +32,10 @@ func InitializeAppDependencies() (*AppDependencies, error) {
 		denouncement.ProvideDenouncementController,
 		ecotour.ProvideEcotourRepository,
 		ecotour.ProvideEcotourController,
+		sowing.ProvideSowingWorkshopRepository,
+		sowing.ProvideSowingController,
+		ecorecovery.ProvideEcorecoveryWorkshopRepository,
+		ecorecovery.ProvideEcorecoveryWorkshopController,
 		wire.Struct(new(AppDependencies), "*"),
 	)
 	return &AppDependencies{}, nil
@@ -37,10 +45,14 @@ func setupRouter(appDependencies *AppDependencies) *gin.Engine {
 	userController := appDependencies.UserController
 	denouncementController := appDependencies.DenouncementController
 	ecotourController := appDependencies.EcotourController
+	sowingWorkshopController := appDependencies.SowingWorkshopController
+	ecorecoveryWorkshopController := appDependencies.EcorecoveryWorkshopController
 	router := gin.Default()
 	user.SetupUserRoutes(router, userController)
 	denouncement.SetupDenouncementRoutes(router, denouncementController)
 	ecotour.SetupEcotourRoutes(router, ecotourController)
+	sowing.SetupSowingWorkshopRoutes(router, sowingWorkshopController)
+	ecorecovery.SetupEcorecoveryWorkshopRoutes(router, ecorecoveryWorkshopController)
 	return router
 }
 

@@ -2,7 +2,7 @@ package sowing
 
 import "github.com/gin-gonic/gin"
 
-func SetupEcotourRoutes(router *gin.Engine, sowingWorkshopController *SowingWorkshopController) {
+func SetupSowingWorkshopRoutes(router *gin.Engine, sowingWorkshopController *SowingWorkshopController) {
 	sowingWorkshopGroup := router.Group("/sowing-workshop")
 	{
 		sowingWorkshopGroup.GET("", sowingWorkshopController.GetAllWorkshops)
