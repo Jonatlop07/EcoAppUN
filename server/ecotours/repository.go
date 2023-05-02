@@ -3,6 +3,7 @@ package ecotour
 import (
 	"context"
 	"errors"
+	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -15,8 +16,8 @@ type EcotourRepository interface {
 	GetAll() ([]*Ecotour, error)
 	Update(*Ecotour) error
 	Delete(string) error
-	AddAttendant(string, string) error
-	RemoveAttendant(string, string) error
+	AddAttendee(string, string) error
+	RemoveAttendee(string, string) error
 }
 
 type MongoDBEcotourRepository struct {
@@ -25,6 +26,8 @@ type MongoDBEcotourRepository struct {
 
 func (repository *MongoDBEcotourRepository) Create(ecotour *Ecotour) error {
 	ecotour.ID = primitive.NewObjectID().Hex()
+	ecotour.CreatedAt = time.Now()
+	ecotour.UpdatedAt = time.Now()
 	_, err := repository.EcotoursCollection.InsertOne(context.TODO(), ecotour)
 	if err != nil {
 		return err
@@ -63,6 +66,7 @@ func (repository *MongoDBEcotourRepository) GetAll() ([]*Ecotour, error) {
 }
 
 func (repository *MongoDBEcotourRepository) Update(ecotour *Ecotour) error {
+	ecotour.UpdatedAt = time.Now()
 	_, err := repository.EcotoursCollection.ReplaceOne(context.TODO(), bson.M{"_id": ecotour.ID}, ecotour)
 	if err != nil {
 		return err
@@ -78,12 +82,12 @@ func (repository *MongoDBEcotourRepository) Delete(id string) error {
 	return nil
 }
 
-func (repository *MongoDBEcotourRepository) AddAttendant(ecotourID string, attendantID string) error {
-	repository.RemoveAttendant(ecotourID, attendantID)
+func (repository *MongoDBEcotourRepository) AddAttendee(ecotourID string, attendeeID string) error {
+	repository.RemoveAttendee(ecotourID, attendeeID)
 	filter := bson.M{"_id": ecotourID}
 	update := bson.M{
 		"$push": bson.M{
-			"ecotours.$.attendants": attendantID,
+			"ecotours.$.attendees": attendeeID,
 		},
 	}
 	_, err := repository.EcotoursCollection.UpdateOne(context.TODO(), filter, update)
@@ -93,11 +97,11 @@ func (repository *MongoDBEcotourRepository) AddAttendant(ecotourID string, atten
 	return nil
 }
 
-func (repository *MongoDBEcotourRepository) RemoveAttendant(ecotourID string, attendantID string) error {
+func (repository *MongoDBEcotourRepository) RemoveAttendee(ecotourID string, attendeeID string) error {
 	filter := bson.M{"_id": ecotourID}
 	update := bson.M{
 		"$pull": bson.M{
-			"ecotours.$.attendants": attendantID,
+			"ecotours.$.attendees": attendeeID,
 		},
 	}
 	_, err := repository.EcotoursCollection.UpdateOne(context.TODO(), filter, update)

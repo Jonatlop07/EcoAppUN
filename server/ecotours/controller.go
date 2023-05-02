@@ -53,13 +53,13 @@ func (controller *EcotourController) GetAllEcotours(ctx *gin.Context) {
 }
 
 func (controller *EcotourController) UpdateEcotour(ctx *gin.Context) {
-	denouncementID := ctx.Param("id")
+	ecotourID := ctx.Param("id")
 	var ecotour Ecotour
 	if err := ctx.ShouldBindJSON(&ecotour); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	ecotour.ID = denouncementID
+	ecotour.ID = ecotourID
 	validate := validator.New()
 	if err := validate.Struct(ecotour); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -80,20 +80,20 @@ func (controller *EcotourController) DeleteEcotour(ctx *gin.Context) {
 	ctx.Status(http.StatusNoContent)
 }
 
-func (controller *EcotourController) AddAttendant(ctx *gin.Context) {
+func (controller *EcotourController) AddAttendee(ctx *gin.Context) {
 	ecotourID := ctx.Param("id")
-	attendantID := ctx.Param("attendant_id")
-	if err := controller.Gateway.AddAttendant(ecotourID, attendantID); err != nil {
+	attendeeID := ctx.Param("attendee_id")
+	if err := controller.Gateway.AddAttendee(ecotourID, attendeeID); err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 	ctx.Status(http.StatusOK)
 }
 
-func (controller *EcotourController) RemoveAttendant(ctx *gin.Context) {
+func (controller *EcotourController) RemoveAttendee(ctx *gin.Context) {
 	ecotourID := ctx.Param("id")
-	attendantID := ctx.Param("attendant_id")
-	if err := controller.Gateway.RemoveAttendant(ecotourID, attendantID); err != nil {
+	attendeeID := ctx.Param("attendee_id")
+	if err := controller.Gateway.RemoveAttendee(ecotourID, attendeeID); err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}

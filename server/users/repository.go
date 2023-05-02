@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -39,6 +40,7 @@ func (repository *MongoDBUserRepository) GetAll() ([]User, error) {
 }
 
 func (r *MongoDBUserRepository) Create(user User) error {
+	user.ID = primitive.NewObjectID().Hex()
 	_, err := r.Collection.InsertOne(context.TODO(), user)
 	return err
 }

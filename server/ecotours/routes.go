@@ -10,7 +10,7 @@ func SetupEcotourRoutes(router *gin.Engine, ecotourController *EcotourController
 		ecotourGroup.POST("", ecotourController.CreateEcotour)
 		ecotourGroup.PATCH("/:id", ecotourController.UpdateEcotour)
 		ecotourGroup.DELETE("/:id", ecotourController.DeleteEcotour)
-		ecotourGroup.PATCH("/:id/attendants/:id", ecotourController.AddAttendant)
-		ecotourGroup.DELETE("/:id/attendants/:id", ecotourController.RemoveAttendant)
+		ecotourGroup.PATCH("/:id/attendees/:attendee_id", ecotourController.AddAttendee)
+		ecotourGroup.DELETE("/:id/attendees/:attendee_id", ecotourController.RemoveAttendee)
 	}
 }
