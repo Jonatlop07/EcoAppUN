@@ -1,12 +1,13 @@
 package main
 
 import (
+	"eco-app/rest-service/catalog"
 	"eco-app/rest-service/db"
-	denouncement "eco-app/rest-service/denouncement"
-	ecorecovery "eco-app/rest-service/ecorecovery"
-	ecotour "eco-app/rest-service/ecotour"
-	sowing "eco-app/rest-service/sowing"
-	user "eco-app/rest-service/user"
+	"eco-app/rest-service/denouncement"
+	"eco-app/rest-service/ecorecovery"
+	"eco-app/rest-service/ecotour"
+	"eco-app/rest-service/sowing"
+	"eco-app/rest-service/user"
 	"log"
 
 	"github.com/gin-gonic/gin"
@@ -21,6 +22,7 @@ type AppDependencies struct {
 	EcotourController             *ecotour.EcotourController
 	SowingWorkshopController      *sowing.SowingWorkshopController
 	EcorecoveryWorkshopController *ecorecovery.EcorecoveryWorkshopController
+	CatalogController             *catalog.CatalogController
 }
 
 func InitializeAppDependencies() (*AppDependencies, error) {
@@ -36,6 +38,8 @@ func InitializeAppDependencies() (*AppDependencies, error) {
 		sowing.ProvideSowingController,
 		ecorecovery.ProvideEcorecoveryWorkshopRepository,
 		ecorecovery.ProvideEcorecoveryWorkshopController,
+		catalog.ProvideCatalogRepository,
+		catalog.ProvideCatalogController,
 		wire.Struct(new(AppDependencies), "*"),
 	)
 	return &AppDependencies{}, nil
@@ -47,12 +51,14 @@ func setupRouter(appDependencies *AppDependencies) *gin.Engine {
 	ecotourController := appDependencies.EcotourController
 	sowingWorkshopController := appDependencies.SowingWorkshopController
 	ecorecoveryWorkshopController := appDependencies.EcorecoveryWorkshopController
+	catalogController := appDependencies.CatalogController
 	router := gin.Default()
 	user.SetupUserRoutes(router, userController)
 	denouncement.SetupDenouncementRoutes(router, denouncementController)
 	ecotour.SetupEcotourRoutes(router, ecotourController)
 	sowing.SetupSowingWorkshopRoutes(router, sowingWorkshopController)
 	ecorecovery.SetupEcorecoveryWorkshopRoutes(router, ecorecoveryWorkshopController)
+	catalog.SetupCatalogRoutes(router, catalogController)
 	return router
 }
 
