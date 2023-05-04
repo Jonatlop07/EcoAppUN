@@ -1,6 +1,7 @@
 package main
 
 import (
+	"eco-app/rest-service/blog"
 	"eco-app/rest-service/catalog"
 	"eco-app/rest-service/db"
 	"eco-app/rest-service/denouncement"
@@ -23,6 +24,7 @@ type AppDependencies struct {
 	SowingWorkshopController      *sowing.SowingWorkshopController
 	EcorecoveryWorkshopController *ecorecovery.EcorecoveryWorkshopController
 	CatalogController             *catalog.CatalogController
+	BlogController                *blog.BlogController
 }
 
 func InitializeAppDependencies() (*AppDependencies, error) {
@@ -40,6 +42,8 @@ func InitializeAppDependencies() (*AppDependencies, error) {
 		ecorecovery.ProvideEcorecoveryWorkshopController,
 		catalog.ProvideCatalogRepository,
 		catalog.ProvideCatalogController,
+		blog.ProvideBlogRepository,
+		blog.ProvideBlogController,
 		wire.Struct(new(AppDependencies), "*"),
 	)
 	return &AppDependencies{}, nil
@@ -52,6 +56,7 @@ func setupRouter(appDependencies *AppDependencies) *gin.Engine {
 	sowingWorkshopController := appDependencies.SowingWorkshopController
 	ecorecoveryWorkshopController := appDependencies.EcorecoveryWorkshopController
 	catalogController := appDependencies.CatalogController
+	blogController := appDependencies.BlogController
 	router := gin.Default()
 	user.SetupUserRoutes(router, userController)
 	denouncement.SetupDenouncementRoutes(router, denouncementController)
@@ -59,6 +64,7 @@ func setupRouter(appDependencies *AppDependencies) *gin.Engine {
 	sowing.SetupSowingWorkshopRoutes(router, sowingWorkshopController)
 	ecorecovery.SetupEcorecoveryWorkshopRoutes(router, ecorecoveryWorkshopController)
 	catalog.SetupCatalogRoutes(router, catalogController)
+	blog.SetupBlogRoutes(router, blogController)
 	return router
 }
 
