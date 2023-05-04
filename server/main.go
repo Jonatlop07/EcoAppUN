@@ -9,10 +9,11 @@ import (
 	"eco-app/rest-service/ecotour"
 	"eco-app/rest-service/sowing"
 	"eco-app/rest-service/user"
+	"fmt"
 	"log"
+	"os"
 
 	"github.com/gin-gonic/gin"
-	"github.com/google/wire"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -28,43 +29,31 @@ type AppDependencies struct {
 }
 
 func InitializeAppDependencies() (*AppDependencies, error) {
-	wire.Build(
-		db.SetupDatabase,
-		user.ProvideUserRepository,
-		user.ProvideUserController,
-		denouncement.ProvideDenouncementRepository,
-		denouncement.ProvideDenouncementController,
-		ecotour.ProvideEcotourRepository,
-		ecotour.ProvideEcotourController,
-		sowing.ProvideSowingWorkshopRepository,
-		sowing.ProvideSowingController,
-		ecorecovery.ProvideEcorecoveryWorkshopRepository,
-		ecorecovery.ProvideEcorecoveryWorkshopController,
-		catalog.ProvideCatalogRepository,
-		catalog.ProvideCatalogController,
-		blog.ProvideBlogRepository,
-		blog.ProvideBlogController,
-		wire.Struct(new(AppDependencies), "*"),
-	)
-	return &AppDependencies{}, nil
+	db, err := db.SetupDatabase()
+	if err != nil {
+		return nil, err
+	}
+	return &AppDependencies{
+		Database:                      db,
+		UserController:                user.ProvideUserController(user.ProvideUserRepository(db)),
+		DenouncementController:        denouncement.ProvideDenouncementController(denouncement.ProvideDenouncementRepository(db)),
+		EcotourController:             ecotour.ProvideEcotourController(ecotour.ProvideEcotourRepository(db)),
+		SowingWorkshopController:      sowing.ProvideSowingController(sowing.ProvideSowingWorkshopRepository(db)),
+		EcorecoveryWorkshopController: ecorecovery.ProvideEcorecoveryWorkshopController(ecorecovery.ProvideEcorecoveryWorkshopRepository(db)),
+		CatalogController:             catalog.ProvideCatalogController(catalog.ProvideCatalogRepository(db)),
+		BlogController:                blog.ProvideBlogController(blog.ProvideBlogRepository(db)),
+	}, nil
 }
 
 func setupRouter(appDependencies *AppDependencies) *gin.Engine {
-	userController := appDependencies.UserController
-	denouncementController := appDependencies.DenouncementController
-	ecotourController := appDependencies.EcotourController
-	sowingWorkshopController := appDependencies.SowingWorkshopController
-	ecorecoveryWorkshopController := appDependencies.EcorecoveryWorkshopController
-	catalogController := appDependencies.CatalogController
-	blogController := appDependencies.BlogController
 	router := gin.Default()
-	user.SetupUserRoutes(router, userController)
-	denouncement.SetupDenouncementRoutes(router, denouncementController)
-	ecotour.SetupEcotourRoutes(router, ecotourController)
-	sowing.SetupSowingWorkshopRoutes(router, sowingWorkshopController)
-	ecorecovery.SetupEcorecoveryWorkshopRoutes(router, ecorecoveryWorkshopController)
-	catalog.SetupCatalogRoutes(router, catalogController)
-	blog.SetupBlogRoutes(router, blogController)
+	user.SetupUserRoutes(router, appDependencies.UserController)
+	denouncement.SetupDenouncementRoutes(router, appDependencies.DenouncementController)
+	ecotour.SetupEcotourRoutes(router, appDependencies.EcotourController)
+	sowing.SetupSowingWorkshopRoutes(router, appDependencies.SowingWorkshopController)
+	ecorecovery.SetupEcorecoveryWorkshopRoutes(router, appDependencies.EcorecoveryWorkshopController)
+	catalog.SetupCatalogRoutes(router, appDependencies.CatalogController)
+	blog.SetupBlogRoutes(router, appDependencies.BlogController)
 	return router
 }
 
@@ -74,7 +63,10 @@ func main() {
 		log.Fatal(err)
 	}
 	router := setupRouter(appDependencies)
-	if err := router.Run(":8080"); err != nil {
+	host := os.Getenv("API_HOST")
+	port := os.Getenv("API_PORT")
+	uri := fmt.Sprintf("%s:%s", host, port)
+	if err := router.Run(uri); err != nil {
 		log.Fatal(err)
 	}
 }

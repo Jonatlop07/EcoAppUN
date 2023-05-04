@@ -2,6 +2,7 @@ package blog
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -39,7 +40,25 @@ func (c *BlogController) GetArticleByID(ctx *gin.Context) {
 }
 
 func (c *BlogController) GetAllArticles(ctx *gin.Context) {
-	articles, err := c.Gateway.GetAll()
+	var filter struct {
+		ID         string    `form:"id"`
+		Categories []string  `form:"categories"`
+		CreatedAt  time.Time `form:"createdAt" time_format:"2006-01-02"`
+		Title      string    `form:"title"`
+	}
+	if err := ctx.ShouldBindQuery(&filter); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	if filter.CreatedAt.IsZero() {
+		filter.CreatedAt = time.Now()
+	}
+	articles, err := c.Gateway.GetAll(&BlogFilter{
+		ID:         filter.ID,
+		Categories: filter.Categories,
+		CreatedAt:  filter.CreatedAt,
+		Title:      filter.Title,
+	})
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

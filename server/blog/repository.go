@@ -9,10 +9,17 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
+type BlogFilter struct {
+	ID         string
+	Categories []string
+	CreatedAt  time.Time
+	Title      string
+}
+
 type BlogRepository interface {
 	Create(article *Article) error
 	GetByID(id string) (*Article, error)
-	GetAll() ([]*Article, error)
+	GetAll(filter *BlogFilter) ([]*Article, error)
 	Update(article *Article) error
 	Delete(id string) error
 	AddReaction(articleID string, reaction *ArticleReaction) error
@@ -48,21 +55,31 @@ func (r *MongoDBBlogRepository) GetByID(id string) (*Article, error) {
 	return &article, nil
 }
 
-func (r *MongoDBBlogRepository) GetAll() ([]*Article, error) {
-	var articles []*Article
-	cursor, err := r.Collection.Find(context.TODO(), bson.M{})
+func (repo *MongoDBBlogRepository) GetAll(filter *BlogFilter) ([]*Article, error) {
+	query := bson.M{}
+	if filter.ID != "" {
+		objectID, err := primitive.ObjectIDFromHex(filter.ID)
+		if err != nil {
+			return nil, err
+		}
+		query["_id"] = objectID
+	}
+	if len(filter.Categories) > 0 {
+		query["category"] = bson.M{"$in": filter.Categories}
+	}
+	if !filter.CreatedAt.IsZero() {
+		query["createdAt"] = bson.M{"$gte": filter.CreatedAt}
+	}
+	if filter.Title != "" {
+		query["title"] = bson.M{"$regex": filter.Title, "$options": "i"}
+	}
+	cursor, err := repo.Collection.Find(context.TODO(), query)
 	if err != nil {
 		return nil, err
 	}
 	defer cursor.Close(context.TODO())
-	for cursor.Next(context.TODO()) {
-		var article Article
-		if err := cursor.Decode(&article); err != nil {
-			return nil, err
-		}
-		articles = append(articles, &article)
-	}
-	if err := cursor.Err(); err != nil {
+	var articles []*Article
+	if err := cursor.All(context.TODO(), &articles); err != nil {
 		return nil, err
 	}
 	return articles, nil

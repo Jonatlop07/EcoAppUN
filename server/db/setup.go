@@ -3,14 +3,15 @@ package db
 import (
 	"context"
 	"log"
+	"os"
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 func SetupDatabase() (*mongo.Database, error) {
-	uri := "mongodb://localhost:27017"
-	dbName := "eco_un"
+	uri := os.Getenv("DB_URI")
+	dbName := os.Getenv("DB_NAME")
 	clientOptions := options.Client().ApplyURI(uri)
 	client, err := mongo.Connect(context.Background(), clientOptions)
 	if err != nil {

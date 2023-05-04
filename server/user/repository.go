@@ -10,7 +10,7 @@ import (
 
 type UserRepository interface {
 	GetAll() ([]User, error)
-	Create(user User) error
+	Create(user *User) error
 	GetByID(id string) (*User, error)
 	Delete(id string) error
 }
@@ -39,7 +39,7 @@ func (repository *MongoDBUserRepository) GetAll() ([]User, error) {
 	return users, nil
 }
 
-func (r *MongoDBUserRepository) Create(user User) error {
+func (r *MongoDBUserRepository) Create(user *User) error {
 	user.ID = primitive.NewObjectID().Hex()
 	_, err := r.Collection.InsertOne(context.TODO(), user)
 	return err
