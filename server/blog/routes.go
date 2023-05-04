@@ -8,7 +8,7 @@ func SetupBlogRoutes(router *gin.Engine, blogController *BlogController) {
 		blogGroup.GET("", blogController.GetAllArticles)
 		blogGroup.POST("", blogController.CreateArticle)
 		blogGroup.GET("/:id", blogController.GetArticleByID)
-		blogGroup.PATCH("/:id", blogController.UpdateArticle)
+		blogGroup.PUT("/:id", blogController.UpdateArticle)
 		blogGroup.DELETE("/:id", blogController.DeleteArticle)
 		blogGroup.PATCH("/:id/reactions/", blogController.AddReactionToArticle)
 		blogGroup.DELETE("/:id/reactions/:user_id", blogController.RemoveReactionFromArticle)

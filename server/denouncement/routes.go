@@ -9,7 +9,7 @@ func SetupDenouncementRoutes(router *gin.Engine, denouncementController *Denounc
 		denouncementGroup.POST("", denouncementController.CreateDenouncement)
 		denouncementGroup.GET("/:id", denouncementController.GetDenouncementByID)
 		denouncementGroup.DELETE("/:id", denouncementController.DeleteDenouncement)
-		denouncementGroup.PATCH("/:id", denouncementController.UpdateDenouncement)
+		denouncementGroup.PUT("/:id", denouncementController.UpdateDenouncement)
 		denouncementGroup.PATCH("/:id/comments/", denouncementController.CreateComment)
 		denouncementGroup.DELETE("/:id/comments/:comment_id", denouncementController.DeleteComment)
 		denouncementGroup.PATCH("/:id/comments/:comment_id/responses", denouncementController.CreateCommentResponse)

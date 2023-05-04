@@ -76,7 +76,8 @@ func (controller *CatalogController) AddSpeciesImageToCatalogRecord(ctx *gin.Con
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	err := controller.Gateway.AddSpeciesImage(id, &image)
+	image.CatalogRecordID = id
+	err := controller.Gateway.AddSpeciesImage(&image)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

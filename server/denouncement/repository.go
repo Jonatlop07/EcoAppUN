@@ -140,6 +140,7 @@ func (r *MongoDBDenouncementRepository) DeleteResponse(response *Response) error
 
 func (r *MongoDBDenouncementRepository) CreateCommentReaction(reaction *CommentReaction) error {
 	r.DeleteCommentReaction(reaction)
+	reaction.CreatedAt = time.Now()
 	filter := bson.M{"_id": reaction.DenouncementID, "comments._id": reaction.CommentID}
 	update := bson.M{
 		"$push": bson.M{
@@ -167,6 +168,7 @@ func (r *MongoDBDenouncementRepository) DeleteCommentReaction(reaction *CommentR
 
 func (r *MongoDBDenouncementRepository) CreateResponseReaction(reaction *ResponseReaction) error {
 	r.DeleteResponseReaction(reaction)
+	reaction.CreatedAt = time.Now()
 	filter := bson.M{
 		"_id":                    reaction.DenouncementID,
 		"comments._id":           reaction.CommentID,

@@ -3,7 +3,7 @@ package ecorecovery
 import "github.com/gin-gonic/gin"
 
 func SetupEcorecoveryWorkshopRoutes(router *gin.Engine, ecorecoveryWorkshopController *EcorecoveryWorkshopController) {
-	ecorecoveryWorkshopGroup := router.Group("/ecorecovery-workshop")
+	ecorecoveryWorkshopGroup := router.Group("/ecorecovery-workshops")
 	{
 		ecorecoveryWorkshopGroup.GET("", ecorecoveryWorkshopController.GetAllWorkshops)
 		ecorecoveryWorkshopGroup.GET("/:id", ecorecoveryWorkshopController.GetWorkshopByID)

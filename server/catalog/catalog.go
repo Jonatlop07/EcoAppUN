@@ -15,11 +15,11 @@ type CatalogRecord struct {
 }
 
 type Image struct {
-	ID          string    `bson:"_id" json:"id"`
-	AuthorID    string    `bson:"authorId" json:"author_id"`
-	AuthorName  string    `bson:"authorName" json:"author_name"`
-	CatalogID   string    `bson:"catalogId" json:"catalog_id"`
-	Description string    `bson:"description" json:"description"`
-	SubmitedAt  time.Time `bson:"submited" json:"submited_at"`
-	URL         string    `bson:"url" json:"url"`
+	ID              string    `bson:"_id" json:"id"`
+	AuthorID        string    `bson:"authorId" json:"author_id"`
+	CatalogRecordID string    `bson:"catalogRecordId" json:"catalog_record_id"`
+	AuthorName      string    `bson:"authorName" json:"author_name"`
+	Description     string    `bson:"description" json:"description"`
+	SubmitedAt      time.Time `bson:"submited" json:"submited_at"`
+	URL             string    `bson:"url" json:"url"`
 }

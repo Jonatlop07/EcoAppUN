@@ -8,8 +8,8 @@ func SetupCatalogRoutes(router *gin.Engine, catalogController *CatalogController
 		catalogGroup.GET("", catalogController.GetAllCatalogRecords)
 		catalogGroup.POST("", catalogController.CreateCatalogRecord)
 		catalogGroup.GET("/:id", catalogController.GetCatalogRecordByID)
+		catalogGroup.PUT("/:id", catalogController.UpdateCatalogRecord)
 		catalogGroup.DELETE("/:id", catalogController.DeleteCatalogRecord)
-		catalogGroup.PATCH("/:id", catalogController.UpdateCatalogRecord)
 		catalogGroup.PATCH("/:id/images", catalogController.AddSpeciesImageToCatalogRecord)
 	}
 }

@@ -99,7 +99,8 @@ func (c *BlogController) AddReactionToArticle(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	err := c.Gateway.AddReaction(articleID, &reaction)
+	reaction.ArticleID = articleID
+	err := c.Gateway.AddReaction(&reaction)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -127,7 +128,8 @@ func (c *BlogController) CreateArticleComment(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	err := c.Gateway.CreateComment(articleID, &comment)
+	comment.ArticleID = articleID
+	err := c.Gateway.CreateComment(&comment)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -150,12 +152,13 @@ func (controller *BlogController) AddReactionToComment(ctx *gin.Context) {
 	articleID := ctx.Param("id")
 	commentID := ctx.Param("comment_id")
 	var reaction CommentReaction
+	reaction.ArticleID = articleID
 	reaction.CommentID = commentID
 	if err := ctx.ShouldBindJSON(&reaction); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	err := controller.Gateway.AddReactionToComment(articleID, &reaction)
+	err := controller.Gateway.AddReactionToComment(&reaction)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

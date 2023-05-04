@@ -22,11 +22,11 @@ type BlogRepository interface {
 	GetAll(filter *BlogFilter) ([]*Article, error)
 	Update(article *Article) error
 	Delete(id string) error
-	AddReaction(articleID string, reaction *ArticleReaction) error
+	AddReaction(reaction *ArticleReaction) error
 	RemoveReaction(articleID string, userID string) error
-	CreateComment(articleID string, comment *Comment) error
+	CreateComment(comment *Comment) error
 	DeleteComment(articleID string, commentID string) error
-	AddReactionToComment(articleID string, reaction *CommentReaction) error
+	AddReactionToComment(reaction *CommentReaction) error
 	RemoveReactionFromComment(articleID string, commentID, reactionID string) error
 }
 
@@ -105,9 +105,10 @@ func (r *MongoDBBlogRepository) Delete(id string) error {
 	return nil
 }
 
-func (r *MongoDBBlogRepository) AddReaction(articleID string, reaction *ArticleReaction) error {
-	r.RemoveReaction(articleID, reaction.UserID)
-	filter := bson.M{"id": articleID}
+func (r *MongoDBBlogRepository) AddReaction(reaction *ArticleReaction) error {
+	r.RemoveReaction(reaction.ArticleID, reaction.UserID)
+	reaction.CreatedAt = time.Now()
+	filter := bson.M{"id": reaction.ArticleID}
 	update := bson.M{"$push": bson.M{"reactions": reaction}}
 	_, err := r.Collection.UpdateOne(context.TODO(), filter, update)
 	if err != nil {
@@ -126,8 +127,9 @@ func (r *MongoDBBlogRepository) RemoveReaction(articleID string, userID string) 
 	return nil
 }
 
-func (r *MongoDBBlogRepository) CreateComment(articleID string, comment *Comment) error {
-	filter := bson.M{"id": articleID}
+func (r *MongoDBBlogRepository) CreateComment(comment *Comment) error {
+	comment.CreatedAt = time.Now()
+	filter := bson.M{"id": comment.ArticleID}
 	update := bson.M{"$push": bson.M{"comments": comment}}
 	_, err := r.Collection.UpdateOne(context.TODO(), filter, update)
 	if err != nil {
@@ -146,8 +148,10 @@ func (r *MongoDBBlogRepository) DeleteComment(articleID string, commentID string
 	return nil
 }
 
-func (r *MongoDBBlogRepository) AddReactionToComment(articleID string, reaction *CommentReaction) error {
-	filter := bson.M{"id": articleID, "comments.id": reaction.CommentID}
+func (r *MongoDBBlogRepository) AddReactionToComment(reaction *CommentReaction) error {
+	r.RemoveReactionFromComment(reaction.ArticleID, reaction.CommentID, reaction.ID)
+	reaction.CreatedAt = time.Now()
+	filter := bson.M{"id": reaction.ArticleID, "comments.id": reaction.CommentID}
 	update := bson.M{"$push": bson.M{"comments.$.reactions": reaction}}
 	_, err := r.Collection.UpdateOne(context.TODO(), filter, update)
 	if err != nil {

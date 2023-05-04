@@ -22,6 +22,7 @@ type Comment struct {
 	Content        string            `bson:"content" json:"content"`
 	CreatedAt      time.Time         `bson:"createdAt" json:"created_at"`
 	Reactions      []CommentReaction `bson:"reactions" json:"reactions"`
+	Responses      []Response        `bson:"responses" json:"responses"`
 }
 
 type CommentReaction struct {

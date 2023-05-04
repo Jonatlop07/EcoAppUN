@@ -15,7 +15,7 @@ type CatalogRepository interface {
 	GetAll() ([]*CatalogRecord, error)
 	Update(catalogRecord *CatalogRecord) error
 	Delete(id string) error
-	AddSpeciesImage(catalogRecordID string, imageDetails *Image) error
+	AddSpeciesImage(imageDetails *Image) error
 }
 
 type MongoDBCatalogRepository struct {
@@ -26,6 +26,10 @@ func (repository *MongoDBCatalogRepository) Create(catalogRecord *CatalogRecord)
 	catalogRecord.ID = primitive.NewObjectID().Hex()
 	catalogRecord.CreatedAt = time.Now()
 	catalogRecord.UpdatedAt = time.Now()
+	images := &catalogRecord.Images
+	for _, image := range *images {
+		image.SubmitedAt = time.Now()
+	}
 	_, err := repository.CatalogRecordsCollection.InsertOne(context.TODO(), catalogRecord)
 	if err != nil {
 		return err
@@ -62,6 +66,12 @@ func (repository *MongoDBCatalogRepository) GetAll() ([]*CatalogRecord, error) {
 
 func (repository *MongoDBCatalogRepository) Update(catalogRecord *CatalogRecord) error {
 	catalogRecord.UpdatedAt = time.Now()
+	images := &catalogRecord.Images
+	for _, image := range *images {
+		if image.SubmitedAt.IsZero() {
+			image.SubmitedAt = time.Now()
+		}
+	}
 	_, err := repository.CatalogRecordsCollection.ReplaceOne(context.TODO(), bson.M{"_id": catalogRecord.ID}, catalogRecord)
 	if err != nil {
 		return err
@@ -77,8 +87,11 @@ func (repository *MongoDBCatalogRepository) Delete(id string) error {
 	return nil
 }
 
-func (repository *MongoDBCatalogRepository) AddSpeciesImage(catalogRecordID string, imageDetails *Image) error {
-	filter := bson.M{"_id": catalogRecordID}
+func (repository *MongoDBCatalogRepository) AddSpeciesImage(imageDetails *Image) error {
+	if imageDetails.SubmitedAt.IsZero() {
+		imageDetails.SubmitedAt = time.Now()
+	}
+	filter := bson.M{"_id": imageDetails.CatalogRecordID}
 	update := bson.M{"$push": bson.M{"images": imageDetails}}
 	_, err := repository.CatalogRecordsCollection.UpdateOne(context.TODO(), filter, update)
 	if err != nil {
