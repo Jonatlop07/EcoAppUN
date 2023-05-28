@@ -45,8 +45,22 @@ func InitializeAppDependencies() (*AppDependencies, error) {
 	}, nil
 }
 
+func setupCORSMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Header("Access-Control-Allow-Origin", "*")
+		c.Header("Access-Control-Allow-Credentials", "true")
+		c.Header(
+			"Access-Control-Allow-Headers",
+			"Content-Type, Content-Length, Accept-Encoding,X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With",
+		)
+		c.Header("Access-Control-Allow-Methods", "POST,HEAD,PATCH, OPTIONS, GET, PUT")
+		c.Next()
+	}
+}
+
 func setupRouter(appDependencies *AppDependencies) *gin.Engine {
 	router := gin.Default()
+	router.Use(setupCORSMiddleware())
 	user.SetupUserRoutes(router, appDependencies.UserController)
 	denouncement.SetupDenouncementRoutes(router, appDependencies.DenouncementController)
 	ecotour.SetupEcotourRoutes(router, appDependencies.EcotourController)

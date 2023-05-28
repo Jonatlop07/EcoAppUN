@@ -6,7 +6,7 @@ services:
       - ./.docker/mongodb/data/db/:/data/db/
       - ./.docker/mongodb/data/log/:/var/log/mongodb/
     ports:
-      - '27017:27017'
+      - '27018:27017'
     networks:
       - backend
   ecoapp_server:
@@ -16,12 +16,12 @@ services:
     volumes:
       - .:/app
     ports:
-      - '8080:8083'
+      - '8083:8080'
     depends_on:
-      - ecpoapp_db
+      - ecoapp_db
     environment:
       API_HOST: '0.0.0.0'
-      API_PORT: '8083'
+      API_PORT: '8080'
       DB_URI: 'mongodb://ecoapp_db:27017'
       DB_NAME: 'eco_un'
     networks:

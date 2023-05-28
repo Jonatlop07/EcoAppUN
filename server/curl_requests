@@ -1,0 +1,15 @@
+docker run --name 
+
+docker ps
+
+docker exec -it <id> bash
+
+
+curl --header "Content-Type: application/json" --request POST --data '{
+    "name": "Jonathan",
+    "email": "example.email1234+test@domain.co.uk",
+    "password": "H3llo@W0rld!+",
+    "phones": []
+}' http://localhost:8083/api/v1/user
+
+curl -f http://0.0.0.0:8000/api/v1/user?id=12bd3172-06c6-4875-a20b-9c78863b4122-a20b-9c78863b4122

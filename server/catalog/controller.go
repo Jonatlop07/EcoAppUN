@@ -11,17 +11,17 @@ type CatalogController struct {
 }
 
 func (controller *CatalogController) CreateCatalogRecord(ctx *gin.Context) {
-	var catalogRecord CatalogRecord
-	if err := ctx.ShouldBindJSON(&catalogRecord); err != nil {
+	var catalogRecordDetails CatalogRecordDetails
+	if err := ctx.ShouldBindJSON(&catalogRecordDetails); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	err := controller.Gateway.Create(&catalogRecord)
+	catalogRecordID, err := controller.Gateway.Create(&catalogRecordDetails)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	ctx.JSON(http.StatusOK, catalogRecord)
+	ctx.JSON(http.StatusOK, catalogRecordID)
 }
 
 func (controller *CatalogController) GetCatalogRecordByID(ctx *gin.Context) {

@@ -6,7 +6,7 @@ FROM golang:1.18-alpine
 # The latest alpine images don't have some tools like (`git` and `bash`).
 # Adding git, bash and openssh to the image
 RUN apk update && apk upgrade && \
-    apk add --no-cache bash git openssh
+    apk add --no-cache bash git openssh curl
 
 # Set the Current Working Directory inside the container
 WORKDIR /app
@@ -24,15 +24,15 @@ COPY . .
 
 ENV API_HOST='0.0.0.0'
     
-ENV API_PORT='8083'
+ENV API_PORT='8080'
     
-ENV DB_URI='mongodb://ecoap_db:27017'
+ENV DB_URI='mongodb://ecoapp_db:27017'
     
 ENV DB_NAME='eco_un'
 
 # Build
 RUN CGO_ENABLED=0 GOOS=linux go build -o /docker-gs-ping
 
-# Expose port 8084 to the outside world
+# Expose port 8083 to the outside world
 EXPOSE 8083
 CMD ["/docker-gs-ping"]

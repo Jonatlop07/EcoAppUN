@@ -10,7 +10,7 @@ import (
 )
 
 type CatalogRepository interface {
-	Create(catalogRecord *CatalogRecord) error
+	Create(catalogRecordDetails *CatalogRecordDetails) (string, error)
 	GetByID(id string) (*CatalogRecord, error)
 	GetAll() ([]*CatalogRecord, error)
 	Update(catalogRecord *CatalogRecord) error
@@ -22,19 +22,13 @@ type MongoDBCatalogRepository struct {
 	CatalogRecordsCollection *mongo.Collection
 }
 
-func (repository *MongoDBCatalogRepository) Create(catalogRecord *CatalogRecord) error {
-	catalogRecord.ID = primitive.NewObjectID().Hex()
-	catalogRecord.CreatedAt = time.Now()
-	catalogRecord.UpdatedAt = time.Now()
-	images := &catalogRecord.Images
-	for _, image := range *images {
-		image.SubmitedAt = time.Now()
-	}
-	_, err := repository.CatalogRecordsCollection.InsertOne(context.TODO(), catalogRecord)
+func (repository *MongoDBCatalogRepository) Create(catalogRecordDetails *CatalogRecordDetails) (string, error) {
+	catalogRecord := FromDetails(catalogRecordDetails)
+	result, err := repository.CatalogRecordsCollection.InsertOne(context.TODO(), catalogRecord)
 	if err != nil {
-		return err
+		return "", err
 	}
-	return nil
+	return result.InsertedID.(primitive.ObjectID).String(), nil
 }
 
 func (repository *MongoDBCatalogRepository) GetByID(id string) (*CatalogRecord, error) {
