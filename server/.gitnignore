@@ -1,4 +1,4 @@
 .bin/
 .data/
 .idea/
-.docker
+.docker/
