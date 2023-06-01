@@ -1,6 +1,8 @@
 package catalog
 
-import "time"
+import (
+	"time"
+)
 
 type CatalogRecord struct {
 	ID             string    `bson:"_id" json:"id" validate:"required"`
@@ -15,11 +17,10 @@ type CatalogRecord struct {
 }
 
 type Image struct {
-	ID              string    `bson:"_id" json:"id" validate:"required"`
-	AuthorID        string    `bson:"authorId" json:"author_id" validate:"required"`
-	CatalogRecordID string    `bson:"catalogRecordId" json:"catalog_record_id" validate:"required"`
-	AuthorName      string    `bson:"authorName" json:"author_name" validate:"required"`
-	Description     string    `bson:"description" json:"description" validate:"required"`
-	SubmitedAt      time.Time `bson:"submited" json:"submited_at" validate:"required"`
-	URL             string    `bson:"url" json:"url" validate:"required"`
+	ID          string    `bson:"_id" json:"id" validate:"required"`
+	AuthorID    string    `bson:"authorId" json:"author_id" validate:"required"`
+	AuthorName  string    `bson:"authorName" json:"author_name" validate:"required"`
+	Description string    `bson:"description" json:"description" validate:"required"`
+	SubmitedAt  time.Time `bson:"submited" json:"submited_at" validate:"required"`
+	URL         string    `bson:"url" json:"url" validate:"required"`
 }

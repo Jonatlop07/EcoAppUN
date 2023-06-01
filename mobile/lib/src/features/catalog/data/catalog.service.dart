@@ -4,7 +4,7 @@ import '../domain/catalog.dart';
 import 'catalog_details.dart';
 
 class CatalogService {
-  final String baseUrl = 'https://api.example.com'; // Reemplaza con la URL correcta de la API
+  final String baseUrl = 'http://localhost:8083'; // Reemplaza con la URL correcta de la API
   final Dio _dio = Dio();
 
   Future<String> createCatalogRecord(CatalogRecordDetails catalogRecordDetails) async {
@@ -31,7 +31,9 @@ class CatalogService {
     try {
       final response = await _dio.get('$baseUrl/catalog-records');
       return List<CatalogRecord>.from(
-        (response.data as List).map((json) => CatalogRecord.fromJson(json)),
+        response.data['records'].map(
+          (record) => CatalogRecord.fromJson(record),
+        ),
       );
     } catch (e) {
       throw Exception('Failed to get all catalog records. Error: $e');
@@ -59,7 +61,7 @@ class CatalogService {
     }
   }
 
-  Future<void> addSpeciesImageToCatalogRecord(Image image) async {
+  Future<void> addSpeciesImageToCatalogRecord(CatalogRecordImage image) async {
     try {
       final response = await _dio.patch(
         '$baseUrl/catalog-records/${image.catalogRecordId}/images',
@@ -74,4 +76,8 @@ class CatalogService {
 
 final catalogServiceProvider = Provider<CatalogService>((ref) {
   return CatalogService();
+});
+
+final getAllCatalogRecordsProvider = FutureProvider<List<CatalogRecord>>((ref) {
+  return ref.read(catalogServiceProvider).getAllCatalogRecords();
 });

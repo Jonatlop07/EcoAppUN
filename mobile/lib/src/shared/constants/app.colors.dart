@@ -7,4 +7,5 @@ class AppColors {
   static const Color lightGreen = Color.fromRGBO(195, 218, 138, 1); // C3DA8A
   static const Color lighterGreen = Color.fromRGBO(179, 204, 174, 1); // B3CCAE
   static const Color white = Colors.white;
+  static const Color error = Colors.redAccent;
 }

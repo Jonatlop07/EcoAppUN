@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:mobile/src/features/catalog/presentation/create_catalog_record/create_catalog_record.state.dart';
-import 'package:mobile/src/features/catalog/presentation/create_catalog_record/catalog_record_details.input.dart';
-import 'package:mobile/src/features/catalog/presentation/create_catalog_record/image_selection.widget.dart';
-import 'package:mobile/src/features/catalog/presentation/create_catalog_record/location_list.widget.dart';
-import 'package:mobile/src/shared/common_widgets/done_button.dart';
-import 'package:mobile/src/shared/common_widgets/responsive_scrollable_card.dart';
-import 'package:mobile/src/shared/common_widgets/simple_text_form_field.dart';
-import 'package:mobile/src/shared/common_widgets/subsection_text.dart';
-import 'package:mobile/src/shared/common_widgets/subsection_title.dart';
-import 'package:mobile/src/shared/routing/route_paths.dart';
-import 'package:mobile/src/shared/utils/async_value_ui.dart';
+import '../../../../shared/async/async_value_ui.dart';
+import '../../../../shared/common_widgets/done_button.dart';
+import '../../../../shared/common_widgets/responsive_scrollable_card.dart';
+import '../../../../shared/common_widgets/simple_text_form_field.dart';
+import '../../../../shared/common_widgets/subsection_text.dart';
+import '../../../../shared/common_widgets/subsection_title.dart';
+import '../../../../shared/routing/route_paths.dart';
+import 'catalog_record_details.input.dart';
 import 'create_catalog_record.controler.dart';
+import 'create_catalog_record.state.dart';
+import 'image_selection.widget.dart';
+import 'location_list.widget.dart';
 
 class CreateCatalogRecordScreen extends StatelessWidget {
   const CreateCatalogRecordScreen({Key? key}) : super(key: key);
@@ -36,10 +36,10 @@ class CreateCatalogRecordScreen extends StatelessWidget {
 class _CreateCatalogRecordForm extends ConsumerStatefulWidget {
   const _CreateCatalogRecordForm({
     Key? key,
-    this.onCatalogRecordCreated,
+    required this.onCatalogRecordCreated,
   }) : super(key: key);
 
-  final Function(String)? onCatalogRecordCreated;
+  final Function(String) onCatalogRecordCreated;
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => _CreateCatalogRecordFormState();
@@ -95,7 +95,7 @@ class _CreateCatalogRecordFormState extends ConsumerState<_CreateCatalogRecordFo
       );
       if (success) {
         String catalogId = state.value as String;
-        widget.onCatalogRecordCreated?.call(catalogId);
+        widget.onCatalogRecordCreated.call(catalogId);
       }
     }
   }

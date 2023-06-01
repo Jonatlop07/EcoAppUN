@@ -7,7 +7,7 @@ class CatalogRecord {
   final String scientificName;
   final String description;
   final List<String> locations;
-  final List<Image> images;
+  final List<CatalogRecordImage> images;
 
   CatalogRecord({
     required this.id,
@@ -31,7 +31,8 @@ class CatalogRecord {
       scientificName: json['scientific_name'],
       description: json['description'],
       locations: List<String>.from(json['locations']),
-      images: List<Image>.from(json['images'].map((image) => Image.fromJson(image))),
+      images: List<CatalogRecordImage>.from(
+          json['images'].map((image) => CatalogRecordImage.fromJson(image))),
     );
   }
 
@@ -50,7 +51,7 @@ class CatalogRecord {
   }
 }
 
-class Image {
+class CatalogRecordImage {
   final String id;
   final String authorId;
   final String authorName;
@@ -59,7 +60,7 @@ class Image {
   final DateTime submittedAt;
   final String url;
 
-  Image({
+  CatalogRecordImage({
     required this.id,
     required this.authorId,
     required this.authorName,
@@ -69,8 +70,8 @@ class Image {
     required this.url,
   });
 
-  factory Image.fromJson(Map<String, dynamic> json) {
-    return Image(
+  factory CatalogRecordImage.fromJson(Map<String, dynamic> json) {
+    return CatalogRecordImage(
       id: json['id'],
       authorId: json['author_id'],
       authorName: json['author_name'],
