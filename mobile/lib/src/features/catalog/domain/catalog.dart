@@ -55,7 +55,6 @@ class CatalogRecordImage {
   final String id;
   final String authorId;
   final String authorName;
-  final String catalogRecordId;
   final String description;
   final DateTime submittedAt;
   final String url;
@@ -64,7 +63,6 @@ class CatalogRecordImage {
     required this.id,
     required this.authorId,
     required this.authorName,
-    required this.catalogRecordId,
     required this.description,
     required this.submittedAt,
     required this.url,
@@ -75,7 +73,6 @@ class CatalogRecordImage {
       id: json['id'],
       authorId: json['author_id'],
       authorName: json['author_name'],
-      catalogRecordId: json['catalog_record_id'],
       description: json['description'],
       submittedAt: DateTime.parse(json['submitted_at']),
       url: json['url'],
@@ -87,7 +84,6 @@ class CatalogRecordImage {
       'id': id,
       'author_id': authorId,
       'author_name': authorName,
-      'catalog_record_id': catalogRecordId,
       'description': description,
       'submitted_at': submittedAt.toIso8601String(),
       'url': url,

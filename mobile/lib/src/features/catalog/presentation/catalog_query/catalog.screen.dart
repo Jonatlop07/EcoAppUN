@@ -20,7 +20,7 @@ class CatalogScreen extends ConsumerWidget {
     required this.onCreateNewCatalogRecord,
   }) : super(key: key);
 
-  final Function(String) onCatalogRecordSelected;
+  final Function(CatalogRecord) onCatalogRecordSelected;
   final Function(String) onEditCatalogRecord;
   final Function(String) onDeleteCatalogRecord;
   final Function() onCreateNewCatalogRecord;
@@ -102,7 +102,7 @@ class CatalogScreen extends ConsumerWidget {
                   switch (selectedAction) {
                     case CatalogRecordAction.query:
                       {
-                        onCatalogRecordSelected.call(catalogRecord.id);
+                        onCatalogRecordSelected.call(catalogRecord);
                       }
                       break;
                     case CatalogRecordAction.edit:

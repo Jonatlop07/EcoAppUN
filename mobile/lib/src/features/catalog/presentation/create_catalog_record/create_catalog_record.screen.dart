@@ -5,9 +5,9 @@ import '../../../../shared/async/async_value_ui.dart';
 import '../../../../shared/common_widgets/done_button.dart';
 import '../../../../shared/common_widgets/responsive_scrollable_card.dart';
 import '../../../../shared/common_widgets/simple_text_form_field.dart';
-import '../../../../shared/common_widgets/subsection_text.dart';
-import '../../../../shared/common_widgets/subsection_title.dart';
-import '../../../../shared/routing/route_paths.dart';
+import '../../../../shared/common_widgets/subtitle.dart';
+import '../../../../shared/common_widgets/screen_title.dart';
+import '../../../../shared/routing/routes.dart';
 import 'catalog_record_details.input.dart';
 import 'create_catalog_record.controler.dart';
 import 'create_catalog_record.state.dart';
@@ -27,7 +27,7 @@ class CreateCatalogRecordScreen extends StatelessWidget {
     return Scaffold(
       appBar: null,
       body: _CreateCatalogRecordForm(
-        onCatalogRecordCreated: (catalogId) => context.go('$RoutePaths.catalog/$catalogId'),
+        onCatalogRecordCreated: (catalogId) => context.pushNamed(Routes.catalog),
       ),
     );
   }
@@ -113,7 +113,7 @@ class _CreateCatalogRecordFormState extends ConsumerState<_CreateCatalogRecordFo
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            SubsectionTitle(text: state.formTitle),
+            ScreenTitle(text: state.formTitle),
             SimpleTextFormField(
               key: CreateCatalogRecordScreen.commonNameKey,
               controller: _commonNameController,
@@ -168,7 +168,7 @@ class _CreateCatalogRecordFormState extends ConsumerState<_CreateCatalogRecordFo
             LocationListWidget(
               onChange: handleOnLocationListChanged,
             ),
-            SubsectionText(text: state.sharePhotosText),
+            Subtitle(text: state.sharePhotosText),
             ImageSelectionWidget(
               onImagesUpdated: handleOnImagesUpdated,
             ),

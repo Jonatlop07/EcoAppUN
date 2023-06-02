@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../domain/catalog.dart';
 import 'catalog_details.dart';
@@ -61,10 +62,11 @@ class CatalogService {
     }
   }
 
-  Future<void> addSpeciesImageToCatalogRecord(CatalogRecordImage image) async {
+  Future<void> addSpeciesImageToCatalogRecord(
+      String catalogRecordId, CatalogRecordImage image) async {
     try {
       final response = await _dio.patch(
-        '$baseUrl/catalog-records/${image.catalogRecordId}/images',
+        '$baseUrl/catalog-records/$catalogRecordId/images',
         data: image.toJson(),
       );
       // Handle response as needed

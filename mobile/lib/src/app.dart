@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile/src/core/theme/light.theme.dart';
-import 'package:mobile/src/shared/constants/app.colors.dart';
 import 'core/routing/app.router.dart';
-import 'shared/constants/palette.dart';
 import 'shared/localization/string.hardcoded.dart';
 
 class MyApp extends ConsumerWidget {
