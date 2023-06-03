@@ -2,20 +2,45 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:mobile/src/features/catalog/domain/catalog.dart';
 import 'package:mobile/src/shared/constants/app.sizes.dart';
 import 'package:mobile/src/shared/localization/string.hardcoded.dart';
 
-class ImageSelectionWidget extends ConsumerStatefulWidget {
-  const ImageSelectionWidget({Key? key, required this.onImagesUpdated}) : super(key: key);
+import 'image_edit_details.input.dart';
 
-  final Function(List<ImageItem>) onImagesUpdated;
+class ImageSelectionWidget extends ConsumerStatefulWidget {
+  const ImageSelectionWidget({
+    Key? key,
+    required this.images,
+    required this.onImagesUpdated,
+  }) : super(key: key);
+
+  final List<CatalogRecordImage> images;
+  final Function(List<ImageEditDetailsInput>) onImagesUpdated;
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => _ImageSelectionWidgetState();
 }
 
 class _ImageSelectionWidgetState extends ConsumerState<ImageSelectionWidget> {
-  final List<ImageItem> _images = [];
+  final List<ImageEditDetailsInput> _images = [];
+
+  @override
+  void initState() {
+    super.initState();
+    for (var image in widget.images) {
+      _images.add(
+        ImageEditDetailsInput(
+          id: image.id,
+          authorId: image.authorId,
+          authorName: image.authorName,
+          description: image.description,
+          url: image.url,
+          submittedAt: image.submittedAt,
+        ),
+      );
+    }
+  }
 
   void _showModal() {
     showModalBottomSheet(
@@ -24,7 +49,7 @@ class _ImageSelectionWidgetState extends ConsumerState<ImageSelectionWidget> {
         return ImageSelectionModal(
           onSelectImage: (String imagePath, String description) {
             setState(() {
-              _images.add(ImageItem(url: imagePath, description: description));
+              _images.add(ImageEditDetailsInput(url: imagePath, description: description));
             });
             widget.onImagesUpdated(_images);
             context.pop();
@@ -37,7 +62,7 @@ class _ImageSelectionWidgetState extends ConsumerState<ImageSelectionWidget> {
     );
   }
 
-  void _showEditModal(int index, ImageItem imageItem) {
+  void _showEditModal(int index, ImageEditDetailsInput imageItem) {
     showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
@@ -76,7 +101,7 @@ class _ImageSelectionWidgetState extends ConsumerState<ImageSelectionWidget> {
           shrinkWrap: true,
           itemCount: _images.length,
           itemBuilder: (BuildContext context, int index) {
-            final ImageItem imageItem = _images[index];
+            final ImageEditDetailsInput imageItem = _images[index];
             return Card(
               child: ListTile(
                 leading: CircleAvatar(
@@ -103,13 +128,6 @@ class _ImageSelectionWidgetState extends ConsumerState<ImageSelectionWidget> {
       ],
     );
   }
-}
-
-class ImageItem {
-  String url;
-  String description;
-
-  ImageItem({required this.url, required this.description});
 }
 
 class ImageSelectionModal extends ConsumerStatefulWidget {

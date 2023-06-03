@@ -1,30 +1,44 @@
 import 'package:flutter/material.dart';
-import 'package:mobile/src/features/catalog/presentation/catalog_record_image.widget.dart';
-import 'package:mobile/src/shared/common_widgets/common_text_span.dart';
-import 'package:mobile/src/shared/common_widgets/subtitle.dart';
-import 'package:mobile/src/shared/localization/string.hardcoded.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mobile/src/shared/common_widgets/navbar.dart';
+import '../../../../shared/localization/string.hardcoded.dart';
 import '../../../../shared/common_widgets/common_text.dart';
+import '../../../../shared/common_widgets/common_rich_text.dart';
 import '../../../../shared/common_widgets/primary_icon_button.dart';
 import '../../../../shared/common_widgets/responsive_scrollable_card.dart';
 import '../../../../shared/common_widgets/screen_title.dart';
+import '../../../../shared/common_widgets/subtitle.dart';
 import '../../../../shared/constants/app.sizes.dart';
 import '../../../../shared/time/datetime.format.dart';
+import '../../data/catalog.service.dart';
 import '../../domain/catalog.dart';
+import '../common/catalog_record_image.widget.dart';
 
-class CatalogRecordScreen extends StatelessWidget {
+class CatalogRecordScreen extends ConsumerWidget {
   const CatalogRecordScreen({
     Key? key,
     required this.catalogRecord,
     required this.onEditCatalogRecord,
+    required this.onDeleteCatalogRecord,
   }) : super(key: key);
 
   final CatalogRecord catalogRecord;
   final Function onEditCatalogRecord;
+  final Function onDeleteCatalogRecord;
+
+  Future<void> handleOnDelete(
+    CatalogRecord catalogRecord,
+    CatalogService catalogService,
+  ) async {
+    await catalogService.deleteCatalogRecord(catalogRecord.id);
+    onDeleteCatalogRecord.call(catalogRecord.id);
+  }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final CatalogService catalogService = ref.watch(catalogServiceProvider);
     return Scaffold(
-        appBar: null,
+        appBar: const NavBar(),
         body: Column(
           children: [
             ResponsiveScrollableCard(
@@ -158,14 +172,16 @@ class CatalogRecordScreen extends StatelessWidget {
                   gapH16,
                   PrimaryIconButton(
                     onPressed: () {
-                      onEditCatalogRecord.call();
+                      onEditCatalogRecord.call(catalogRecord);
                     },
                     icon: const Icon(Icons.edit),
                     text: 'Editar'.hardcoded,
                   ),
                   gapH16,
                   PrimaryIconButton(
-                    onPressed: () {},
+                    onPressed: () async {
+                      await handleOnDelete(catalogRecord, catalogService);
+                    },
                     icon: const Icon(Icons.delete),
                     text: 'Eliminar'.hardcoded,
                   ),

@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mobile/src/features/catalog/presentation/edit_catalog_record/catalog_record_details.input.dart';
 import '../domain/catalog.dart';
 import 'catalog_details.dart';
 
@@ -41,12 +41,13 @@ class CatalogService {
     }
   }
 
-  Future<void> updateCatalogRecord(CatalogRecord catalogRecord) async {
+  Future<String> updateCatalogRecord(CatalogRecordEditDetailsInput catalogRecord) async {
     try {
       final response = await _dio.put(
         '$baseUrl/catalog-records/${catalogRecord.id}',
         data: catalogRecord.toJson(),
       );
+      return response.data['catalog_record_id'].toString();
       // Handle response as needed
     } catch (e) {
       throw Exception('Failed to update catalog record. Error: $e');

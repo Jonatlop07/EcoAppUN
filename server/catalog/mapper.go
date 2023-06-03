@@ -77,14 +77,23 @@ func FromCatalogRecordModel(model CatalogRecordModel) CatalogRecord {
 }
 
 func FromImage(image Image) ImageModel {
-	imageId, _ := primitive.ObjectIDFromHex(image.ID)
+	var imageId primitive.ObjectID
+	var submitedAt time.Time
+	if image.ID != "" {
+		imageId, _ = primitive.ObjectIDFromHex(image.ID)
+	} else {
+		imageId = primitive.NewObjectID()
+	}
+	if submitedAt = image.SubmitedAt; image.SubmitedAt.IsZero() {
+		submitedAt = time.Now()
+	}
 	authorId, _ := primitive.ObjectIDFromHex(image.AuthorID)
 	return ImageModel{
 		ID:          imageId,
 		AuthorID:    authorId,
 		AuthorName:  image.AuthorName,
 		Description: image.Description,
-		SubmitedAt:  image.SubmitedAt,
+		SubmitedAt:  submitedAt,
 		URL:         image.URL,
 	}
 }

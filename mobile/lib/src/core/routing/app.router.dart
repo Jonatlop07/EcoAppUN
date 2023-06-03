@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mobile/src/features/catalog/presentation/edit_catalog_record/edit_catalog_record.screen.dart';
 import '../../features/catalog/domain/catalog.dart';
 import '../../features/catalog/presentation/catalog_query/catalog.screen.dart';
 import '../../features/catalog/presentation/catalog_record_query/catalog_record.screen.dart';
@@ -27,8 +28,12 @@ final goRouterProvider = Provider<GoRouter>((ref) {
                 extra: catalogRecord.toJson(),
               );
             },
-            onEditCatalogRecord: (String catalogRecordId) {
-              context.pushNamed(Routes.createCatalogRecord);
+            onEditCatalogRecord: (CatalogRecord catalogRecord) {
+              context.pushNamed(
+                Routes.editCatalogRecord,
+                pathParameters: {"catalogRecordId": catalogRecord.id},
+                extra: catalogRecord.toJson(),
+              );
             },
             onDeleteCatalogRecord: (String catalogRecordId) {
               context.pushNamed(Routes.catalog);
@@ -49,6 +54,21 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             ),
           ),
           GoRoute(
+            path: 'edit/:catalogRecordId',
+            name: Routes.editCatalogRecord,
+            pageBuilder: (context, state) {
+              final data = state.extra as Map<String, dynamic>;
+              CatalogRecord catalogRecord = CatalogRecord.fromJson(data);
+              return TransitionScreen.createFade(
+                context,
+                state,
+                EditCatalogRecordScreen(
+                  catalogRecord: catalogRecord,
+                ),
+              );
+            },
+          ),
+          GoRoute(
             path: ':catalogRecordId',
             name: Routes.queryCatalogRecord,
             pageBuilder: (context, state) {
@@ -59,8 +79,15 @@ final goRouterProvider = Provider<GoRouter>((ref) {
                 state,
                 CatalogRecordScreen(
                   catalogRecord: catalogRecord,
-                  onEditCatalogRecord: () {
-                    context.pushNamed(Routes.createCatalogRecord);
+                  onEditCatalogRecord: (CatalogRecord catalogRecord) {
+                    context.pushNamed(
+                      Routes.editCatalogRecord,
+                      pathParameters: {"catalogRecordId": catalogRecord.id},
+                      extra: catalogRecord.toJson(),
+                    );
+                  },
+                  onDeleteCatalogRecord: (String catalogRecordId) {
+                    context.pushNamed(Routes.catalog);
                   },
                 ),
               );

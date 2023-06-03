@@ -2,15 +2,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile/src/shared/localization/string.hardcoded.dart';
 import 'package:mobile/src/shared/validators/string.validator.dart';
 
-mixin CreateCatalogRecordValidators {
+mixin EditCatalogRecordValidators {
   final StringValidator titleSubmitValidator = NonEmptyStringValidator();
   final StringValidator commonNameSubmitValidator = NonEmptyStringValidator();
   final StringValidator scientificNameSubmitValidator = NonEmptyStringValidator();
   final StringValidator descriptionSubmitValidator = NonEmptyStringValidator();
 }
 
-class CreateCatalogRecordState with CreateCatalogRecordValidators {
-  CreateCatalogRecordState({
+class EditCatalogRecordState with EditCatalogRecordValidators {
+  EditCatalogRecordState({
     this.value = const AsyncValue.data(''),
   });
 
@@ -18,30 +18,30 @@ class CreateCatalogRecordState with CreateCatalogRecordValidators {
 
   bool get isLoading => value.isLoading;
 
-  CreateCatalogRecordState copyWith({AsyncValue<String>? value}) {
-    return CreateCatalogRecordState(value: value ?? this.value);
+  EditCatalogRecordState copyWith({AsyncValue<String>? value}) {
+    return EditCatalogRecordState(value: value ?? this.value);
   }
 
   @override
-  String toString() => 'CreateCatalogRecordState(value: $value)';
+  String toString() => 'EditCatalogRecordState(value: $value)';
 
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
-    return other is CreateCatalogRecordState && other.value == value;
+    return other is EditCatalogRecordState && other.value == value;
   }
 
   @override
   int get hashCode => value.hashCode;
 }
 
-extension CreateCatalogRecordStateX on CreateCatalogRecordState {
+extension EditCatalogRecordStateX on EditCatalogRecordState {
   int get textFieldMaxLength => 1024;
   int get textFieldMinLines => 1;
   int get textFieldMaxLines => 3;
 
   String get formTitle {
-    return 'Nueva ficha de especie'.hardcoded;
+    return 'Editar ficha de especie'.hardcoded;
   }
 
   String get commonNameHintText {
@@ -87,6 +87,6 @@ extension CreateCatalogRecordStateX on CreateCatalogRecordState {
   }
 
   String get sharePhotosText {
-    return 'Comparte fotos de esta especie'.hardcoded;
+    return 'Fotos de esta especie'.hardcoded;
   }
 }

@@ -16,7 +16,7 @@ void main() async {
     ErrorWidget.builder = (FlutterErrorDetails details) {
       return Scaffold(
         appBar: AppBar(
-          backgroundColor: AppColors.white,
+          backgroundColor: AppColors.error,
           title: Text('Ocurrió un error'.hardcoded),
         ),
         body: Center(child: Text(details.toString())),

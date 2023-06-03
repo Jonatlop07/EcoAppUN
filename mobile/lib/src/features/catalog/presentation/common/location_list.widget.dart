@@ -4,8 +4,13 @@ import 'package:mobile/src/shared/constants/app.sizes.dart';
 import 'package:mobile/src/shared/localization/string.hardcoded.dart';
 
 class LocationListWidget extends ConsumerStatefulWidget {
-  const LocationListWidget({Key? key, required this.onChange}) : super(key: key);
+  const LocationListWidget({
+    Key? key,
+    required this.locations,
+    required this.onChange,
+  }) : super(key: key);
 
+  final List<String> locations;
   final Function(List<String>) onChange;
 
   @override
@@ -17,6 +22,14 @@ class _LocationListWidgetState extends ConsumerState<LocationListWidget> {
   final TextEditingController _editLocationController = TextEditingController();
   final List<String> _locations = [];
   int _editingIndex = -1;
+
+  @override
+  void initState() {
+    for (var location in widget.locations) {
+      _locations.add(location);
+    }
+    super.initState();
+  }
 
   @override
   void dispose() {

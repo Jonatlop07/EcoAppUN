@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 )
 
 type CatalogController struct {
@@ -17,6 +18,11 @@ func (controller *CatalogController) CreateCatalogRecord(ctx *gin.Context) {
 		return
 	}
 	catalogRecordID, err := controller.Gateway.Create(catalogRecordDetails)
+	validate := validator.New()
+	if err := validate.Struct(catalogRecordDetails); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -51,12 +57,17 @@ func (controller *CatalogController) UpdateCatalogRecord(ctx *gin.Context) {
 		return
 	}
 	catalogRecord.ID = id
+	validate := validator.New()
+	if err := validate.Struct(catalogRecord); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
 	err := controller.Gateway.Update(catalogRecord)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	ctx.JSON(http.StatusOK, gin.H{"catalog_record": catalogRecord})
+	ctx.JSON(http.StatusOK, gin.H{"catalog_record_id": id})
 }
 
 func (controller *CatalogController) DeleteCatalogRecord(ctx *gin.Context) {

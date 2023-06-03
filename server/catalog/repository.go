@@ -62,12 +62,6 @@ func (repository *MongoDBCatalogRepository) GetAll() ([]CatalogRecord, error) {
 func (repository *MongoDBCatalogRepository) Update(catalogRecord CatalogRecord) error {
 	catalogRecordModel := FromCatalogRecord(catalogRecord)
 	catalogRecordModel.UpdatedAt = time.Now()
-	images := catalogRecordModel.Images
-	for _, image := range images {
-		if image.SubmitedAt.IsZero() {
-			image.SubmitedAt = time.Now()
-		}
-	}
 	_, err := repository.CatalogRecordsCollection.ReplaceOne(context.TODO(), bson.M{"_id": catalogRecordModel.ID}, catalogRecordModel)
 	if err != nil {
 		return err

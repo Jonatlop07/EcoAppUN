@@ -9,15 +9,21 @@ import '../../../../shared/common_widgets/simple_text_form_field.dart';
 import '../../../../shared/common_widgets/subtitle.dart';
 import '../../../../shared/common_widgets/screen_title.dart';
 import '../../../../shared/routing/routes.dart';
+import '../../domain/catalog.dart';
 import '../common/image_edit_details.input.dart';
-import 'catalog_record_details.input.dart';
-import 'create_catalog_record.controler.dart';
-import 'create_catalog_record.state.dart';
 import '../common/image_selection.widget.dart';
 import '../common/location_list.widget.dart';
+import 'catalog_record_details.input.dart';
+import 'edit_catalog_record.controler.dart';
+import 'edit_catalog_record.state.dart';
 
-class CreateCatalogRecordScreen extends StatelessWidget {
-  const CreateCatalogRecordScreen({Key? key}) : super(key: key);
+class EditCatalogRecordScreen extends StatelessWidget {
+  const EditCatalogRecordScreen({
+    Key? key,
+    required this.catalogRecord,
+  }) : super(key: key);
+
+  final CatalogRecord catalogRecord;
 
   static const commonNameKey = Key('commonName');
   static const scientificNameKey = Key('scientificName');
@@ -27,26 +33,32 @@ class CreateCatalogRecordScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const NavBar(),
-      body: _CreateCatalogRecordForm(
-        onCatalogRecordCreated: (catalogId) => context.pushNamed(Routes.catalog),
+      body: _EditCatalogRecordForm(
+        catalogRecord: catalogRecord,
+        onCatalogRecordEdited: (catalogId) => context.pushNamed(
+          Routes.queryCatalogRecord,
+          pathParameters: {"catalogRecordId": catalogId},
+        ),
       ),
     );
   }
 }
 
-class _CreateCatalogRecordForm extends ConsumerStatefulWidget {
-  const _CreateCatalogRecordForm({
+class _EditCatalogRecordForm extends ConsumerStatefulWidget {
+  const _EditCatalogRecordForm({
     Key? key,
-    required this.onCatalogRecordCreated,
+    required this.catalogRecord,
+    required this.onCatalogRecordEdited,
   }) : super(key: key);
 
-  final Function(String) onCatalogRecordCreated;
+  final CatalogRecord catalogRecord;
+  final Function(String) onCatalogRecordEdited;
 
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() => _CreateCatalogRecordFormState();
+  ConsumerState<ConsumerStatefulWidget> createState() => _EditCatalogRecordFormState();
 }
 
-class _CreateCatalogRecordFormState extends ConsumerState<_CreateCatalogRecordForm> {
+class _EditCatalogRecordFormState extends ConsumerState<_EditCatalogRecordForm> {
   final _formKey = GlobalKey<FormState>();
   final _node = FocusScopeNode();
   final _commonNameController = TextEditingController();
@@ -61,6 +73,34 @@ class _CreateCatalogRecordFormState extends ConsumerState<_CreateCatalogRecordFo
   List<ImageEditDetailsInput> _images = [];
 
   var _submitted = false;
+
+  @override
+  void initState() {
+    for (var image in widget.catalogRecord.images) {
+      _images.add(
+        ImageEditDetailsInput(
+          id: image.id,
+          authorId: image.authorId,
+          authorName: image.authorName,
+          description: image.description,
+          url: image.url,
+          submittedAt: image.submittedAt,
+        ),
+      );
+    }
+    for (var location in widget.catalogRecord.locations) {
+      _locations.add(location);
+    }
+    super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    _commonNameController.text = widget.catalogRecord.commonName;
+    _scientificNameController.text = widget.catalogRecord.scientificName;
+    _descriptionController.text = widget.catalogRecord.description;
+    super.didChangeDependencies();
+  }
 
   @override
   void dispose() {
@@ -83,24 +123,37 @@ class _CreateCatalogRecordFormState extends ConsumerState<_CreateCatalogRecordFo
     _images = images;
   }
 
-  Future<void> _submit(CreateCatalogRecordState state) async {
+  Future<void> _submit(EditCatalogRecordState state) async {
     setState(() => _submitted = true);
     if (_formKey.currentState!.validate()) {
-      final controller = ref.read(createCatalogRecordControllerProvider(null).notifier);
+      final controller = ref.read(editCatalogRecordControllerProvider(null).notifier);
       final success = await controller.submit(
-        CatalogRecordDetailsInput(
+        CatalogRecordEditDetailsInput(
+          id: widget.catalogRecord.id,
+          authorId: widget.catalogRecord.authorId,
           commonName: commonName,
           scientificName: scientificName,
           description: description,
+          createdAt: widget.catalogRecord.createdAt,
+          updatedAt: widget.catalogRecord.updatedAt,
           locations: _locations,
           images: _images
-              .map((image) => ImageEditDetailsInput(description: image.description, url: image.url))
+              .map(
+                (image) => ImageEditDetailsInput(
+                  id: image.id,
+                  authorId: image.authorId,
+                  authorName: image.authorName,
+                  description: image.description,
+                  submittedAt: image.submittedAt,
+                  url: image.url,
+                ),
+              )
               .toList(),
         ),
       );
       if (success) {
         String catalogId = state.value as String;
-        widget.onCatalogRecordCreated.call(catalogId);
+        widget.onCatalogRecordEdited.call(catalogId);
       }
     }
   }
@@ -108,10 +161,10 @@ class _CreateCatalogRecordFormState extends ConsumerState<_CreateCatalogRecordFo
   @override
   Widget build(BuildContext context) {
     ref.listen<AsyncValue>(
-      createCatalogRecordControllerProvider(null).select((state) => state.value),
+      editCatalogRecordControllerProvider(null).select((state) => state.value),
       (_, state) => state.showAlertDialogOnError(context),
     );
-    final state = ref.watch(createCatalogRecordControllerProvider(null));
+    final state = ref.watch(editCatalogRecordControllerProvider(null));
     return ResponsiveScrollableCard(
       child: FocusScope(
         node: _node,
@@ -122,7 +175,7 @@ class _CreateCatalogRecordFormState extends ConsumerState<_CreateCatalogRecordFo
             children: <Widget>[
               ScreenTitle(text: state.formTitle),
               SimpleTextFormField(
-                key: CreateCatalogRecordScreen.commonNameKey,
+                key: EditCatalogRecordScreen.commonNameKey,
                 controller: _commonNameController,
                 decoration: InputDecoration(
                   hintText: state.commonNameHintText,
@@ -136,7 +189,7 @@ class _CreateCatalogRecordFormState extends ConsumerState<_CreateCatalogRecordFo
                 onEditingComplete: focusNextInput,
               ),
               SimpleTextFormField(
-                key: CreateCatalogRecordScreen.scientificNameKey,
+                key: EditCatalogRecordScreen.scientificNameKey,
                 controller: _scientificNameController,
                 decoration: InputDecoration(
                   hintText: state.scientificNameHintText,
@@ -150,7 +203,7 @@ class _CreateCatalogRecordFormState extends ConsumerState<_CreateCatalogRecordFo
                 onEditingComplete: focusNextInput,
               ),
               SimpleTextFormField(
-                key: CreateCatalogRecordScreen.descriptionKey,
+                key: EditCatalogRecordScreen.descriptionKey,
                 controller: _descriptionController,
                 decoration: InputDecoration(
                   hintText: state.descriptionHintText,
@@ -163,12 +216,12 @@ class _CreateCatalogRecordFormState extends ConsumerState<_CreateCatalogRecordFo
                     !_submitted ? null : state.descriptionErrorText(commonName ?? ''),
               ),
               LocationListWidget(
-                locations: const [],
+                locations: widget.catalogRecord.locations,
                 onChange: handleOnLocationListChanged,
               ),
               Subtitle(text: state.sharePhotosText),
               ImageSelectionWidget(
-                images: const [],
+                images: widget.catalogRecord.images,
                 onImagesUpdated: handleOnImagesUpdated,
               ),
               DoneButton(

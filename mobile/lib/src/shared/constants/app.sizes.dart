@@ -47,23 +47,23 @@ const insetsAll48 = EdgeInsets.all(Sizes.p48);
 const insetsAll64 = EdgeInsets.all(Sizes.p64);
 
 // Constant horizontal edge insets
-const insetsH4 = EdgeInsets.only(left: Sizes.p4, right: Sizes.p4);
-const insetsH8 = EdgeInsets.only(left: Sizes.p8, right: Sizes.p8);
-const insetsH12 = EdgeInsets.only(left: Sizes.p12, right: Sizes.p12);
-const insetsH16 = EdgeInsets.only(left: Sizes.p16, right: Sizes.p16);
-const insetsH20 = EdgeInsets.only(left: Sizes.p20, right: Sizes.p20);
-const insetsH24 = EdgeInsets.only(left: Sizes.p24, right: Sizes.p24);
-const insetsH32 = EdgeInsets.only(left: Sizes.p32, right: Sizes.p32);
-const insetsH48 = EdgeInsets.only(left: Sizes.p48, right: Sizes.p48);
-const insetsH64 = EdgeInsets.only(left: Sizes.p64, right: Sizes.p64);
+const insetsH4 = EdgeInsets.symmetric(horizontal: Sizes.p4);
+const insetsH8 = EdgeInsets.symmetric(horizontal: Sizes.p8);
+const insetsH12 = EdgeInsets.symmetric(horizontal: Sizes.p12);
+const insetsH16 = EdgeInsets.symmetric(horizontal: Sizes.p16);
+const insetsH20 = EdgeInsets.symmetric(horizontal: Sizes.p20);
+const insetsH24 = EdgeInsets.symmetric(horizontal: Sizes.p24);
+const insetsH32 = EdgeInsets.symmetric(horizontal: Sizes.p32);
+const insetsH48 = EdgeInsets.symmetric(horizontal: Sizes.p48);
+const insetsH64 = EdgeInsets.symmetric(horizontal: Sizes.p64);
 
 // Constant vertical edge insets
-const insetsV4 = EdgeInsets.only(top: Sizes.p4, bottom: Sizes.p4);
-const insetsV8 = EdgeInsets.only(top: Sizes.p8, bottom: Sizes.p8);
-const insetsV12 = EdgeInsets.only(top: Sizes.p12, bottom: Sizes.p12);
-const insetsV16 = EdgeInsets.only(top: Sizes.p16, bottom: Sizes.p16);
-const insetsV20 = EdgeInsets.only(top: Sizes.p20, bottom: Sizes.p20);
-const insetsV24 = EdgeInsets.only(top: Sizes.p24, bottom: Sizes.p24);
-const insetsV32 = EdgeInsets.only(top: Sizes.p32, bottom: Sizes.p32);
-const insetsV48 = EdgeInsets.only(top: Sizes.p48, bottom: Sizes.p48);
-const insetsV64 = EdgeInsets.only(top: Sizes.p64, bottom: Sizes.p64);
+const insetsV4 = EdgeInsets.symmetric(vertical: Sizes.p4);
+const insetsV8 = EdgeInsets.symmetric(vertical: Sizes.p8);
+const insetsV12 = EdgeInsets.symmetric(vertical: Sizes.p12);
+const insetsV16 = EdgeInsets.symmetric(vertical: Sizes.p16);
+const insetsV20 = EdgeInsets.symmetric(vertical: Sizes.p20);
+const insetsV24 = EdgeInsets.symmetric(vertical: Sizes.p24);
+const insetsV32 = EdgeInsets.symmetric(vertical: Sizes.p32);
+const insetsV48 = EdgeInsets.symmetric(vertical: Sizes.p48);
+const insetsV64 = EdgeInsets.symmetric(vertical: Sizes.p64);

@@ -1,9 +1,11 @@
+import '../common/image_edit_details.input.dart';
+
 class CatalogRecordDetailsInput {
   final String commonName;
   final String scientificName;
   final String description;
   final List<String> locations;
-  final List<ImageDetailsInput> images;
+  final List<ImageEditDetailsInput> images;
 
   CatalogRecordDetailsInput({
     required this.commonName,
@@ -11,15 +13,5 @@ class CatalogRecordDetailsInput {
     required this.description,
     required this.locations,
     required this.images,
-  });
-}
-
-class ImageDetailsInput {
-  final String description;
-  final String url;
-
-  ImageDetailsInput({
-    required this.description,
-    required this.url,
   });
 }

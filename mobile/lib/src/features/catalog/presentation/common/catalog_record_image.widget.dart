@@ -1,11 +1,11 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
-import '../../../shared/common_widgets/common_text.dart';
-import '../../../shared/common_widgets/common_text_span.dart';
-import '../../../shared/constants/app.sizes.dart';
-import '../../../shared/time/datetime.format.dart';
-import '../domain/catalog.dart';
+import '../../../../shared/common_widgets/common_text.dart';
+import '../../../../shared/common_widgets/common_rich_text.dart';
+import '../../../../shared/constants/app.sizes.dart';
+import '../../../../shared/time/datetime.format.dart';
+import '../../domain/catalog.dart';
 
 class CatalogRecordImageWidget extends StatelessWidget {
   const CatalogRecordImageWidget({

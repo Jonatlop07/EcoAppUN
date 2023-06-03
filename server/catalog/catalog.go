@@ -17,7 +17,7 @@ type CatalogRecord struct {
 }
 
 type Image struct {
-	ID          string    `bson:"_id" json:"id" validate:"required"`
+	ID          string    `bson:"_id" json:"id"`
 	AuthorID    string    `bson:"authorId" json:"author_id" validate:"required"`
 	AuthorName  string    `bson:"authorName" json:"author_name" validate:"required"`
 	Description string    `bson:"description" json:"description" validate:"required"`

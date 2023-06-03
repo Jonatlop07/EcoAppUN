@@ -1,13 +1,16 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mobile/src/shared/common_widgets/navbar.dart';
+import 'package:mobile/src/shared/constants/app.sizes.dart';
 
+import '../../../../shared/common_widgets/screen_title.dart';
 import '../../../../shared/time/datetime.format.dart';
 import '../../../../shared/localization/string.hardcoded.dart';
 import '../../../../shared/common_widgets/async_value.dart';
 import '../../data/catalog.service.dart';
 import '../../domain/catalog.dart';
-import '../catalog.builder.dart';
+import '../common/catalog.builder.dart';
 
 enum CatalogRecordAction { query, edit, delete }
 
@@ -21,7 +24,7 @@ class CatalogScreen extends ConsumerWidget {
   }) : super(key: key);
 
   final Function(CatalogRecord) onCatalogRecordSelected;
-  final Function(String) onEditCatalogRecord;
+  final Function(CatalogRecord) onEditCatalogRecord;
   final Function(String) onDeleteCatalogRecord;
   final Function() onCreateNewCatalogRecord;
 
@@ -43,7 +46,7 @@ class CatalogScreen extends ConsumerWidget {
       value: catalogRecordsAsync,
       data: (catalogRecords) {
         return Scaffold(
-          appBar: null,
+          appBar: const NavBar(),
           body: CatalogBuilder(
             catalogRecords: catalogRecords,
             catalogRecordBuilder: (_, catalogRecord, index) => ListTile(
@@ -107,7 +110,7 @@ class CatalogScreen extends ConsumerWidget {
                       break;
                     case CatalogRecordAction.edit:
                       {
-                        onEditCatalogRecord.call(catalogRecord.id);
+                        onEditCatalogRecord.call(catalogRecord);
                       }
                       break;
                     case CatalogRecordAction.delete:
@@ -132,6 +135,9 @@ class CatalogScreen extends ConsumerWidget {
                   ),
                 ],
               ),
+              onTap: () {
+                onCatalogRecordSelected.call(catalogRecord);
+              },
             ),
           ),
           floatingActionButton: FloatingActionButton(
