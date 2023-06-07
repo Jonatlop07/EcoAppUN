@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile/src/features/catalog/presentation/edit_catalog_record/edit_catalog_record.screen.dart';
+import 'package:mobile/src/features/sowing/presentation/create_sowing_workshop/create_sowing_workshop.screen.dart';
 import '../../features/catalog/domain/catalog.dart';
 import '../../features/catalog/presentation/catalog_query/catalog.screen.dart';
 import '../../features/catalog/presentation/catalog_record_query/catalog_record.screen.dart';
@@ -15,6 +16,15 @@ final goRouterProvider = Provider<GoRouter>((ref) {
     debugLogDiagnostics: true,
     routes: [
       GoRoute(
+        path: '/',
+        name: Routes.createSowingWorkshop,
+        pageBuilder: (context, state) => TransitionScreen.createFade(
+          context,
+          state,
+          const CreateSowingWorkshopScreen(),
+        ),
+      )
+      /*  GoRoute(
         path: '/',
         name: Routes.catalog,
         pageBuilder: (context, state) => TransitionScreen.createFade(
@@ -95,6 +105,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           ),
         ],
       ),
+    */
     ],
     errorBuilder: (context, state) => const NotFoundScreen(),
   );

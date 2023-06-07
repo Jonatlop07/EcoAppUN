@@ -3,7 +3,6 @@ import 'package:mobile/src/shared/localization/string.hardcoded.dart';
 import 'package:mobile/src/shared/validators/string.validator.dart';
 
 mixin CreateCatalogRecordValidators {
-  final StringValidator titleSubmitValidator = NonEmptyStringValidator();
   final StringValidator commonNameSubmitValidator = NonEmptyStringValidator();
   final StringValidator scientificNameSubmitValidator = NonEmptyStringValidator();
   final StringValidator descriptionSubmitValidator = NonEmptyStringValidator();

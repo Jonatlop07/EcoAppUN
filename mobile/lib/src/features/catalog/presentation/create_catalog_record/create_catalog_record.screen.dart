@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile/src/shared/common_widgets/navbar.dart';
+import 'package:mobile/src/shared/localization/string.hardcoded.dart';
 import '../../../../shared/async/async_value_ui.dart';
 import '../../../../shared/common_widgets/done_button.dart';
 import '../../../../shared/common_widgets/responsive_scrollable_card.dart';
@@ -10,11 +11,11 @@ import '../../../../shared/common_widgets/subtitle.dart';
 import '../../../../shared/common_widgets/screen_title.dart';
 import '../../../../shared/routing/routes.dart';
 import '../common/image_edit_details.input.dart';
+import '../../../../shared/common_widgets/input_list.widget.dart';
 import 'catalog_record_details.input.dart';
 import 'create_catalog_record.controler.dart';
 import 'create_catalog_record.state.dart';
 import '../common/image_selection.widget.dart';
-import '../common/location_list.widget.dart';
 
 class CreateCatalogRecordScreen extends StatelessWidget {
   const CreateCatalogRecordScreen({Key? key}) : super(key: key);
@@ -162,8 +163,9 @@ class _CreateCatalogRecordFormState extends ConsumerState<_CreateCatalogRecordFo
                 validator: (commonName) =>
                     !_submitted ? null : state.descriptionErrorText(commonName ?? ''),
               ),
-              LocationListWidget(
-                locations: const [],
+              InputListWidget(
+                items: const [],
+                label: 'Ingrese una ubicación donde encontrar a la especie'.hardcoded,
                 onChange: handleOnLocationListChanged,
               ),
               Subtitle(text: state.sharePhotosText),

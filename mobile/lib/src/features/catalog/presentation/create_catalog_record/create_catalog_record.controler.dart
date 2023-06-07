@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile/src/features/catalog/data/catalog.service.dart';
-import 'package:mobile/src/features/catalog/data/catalog_details.dart';
+import 'package:mobile/src/features/catalog/data/catalog_record_details.dart';
 import 'package:mobile/src/features/catalog/presentation/create_catalog_record/create_catalog_record.state.dart';
 import 'package:mobile/src/shared/state/auth_state.accesor.dart';
 import 'package:mobile/src/shared/state/app_user.dart';

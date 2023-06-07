@@ -27,7 +27,6 @@ class _ImageSelectionWidgetState extends ConsumerState<ImageSelectionWidget> {
 
   @override
   void initState() {
-    super.initState();
     for (var image in widget.images) {
       _images.add(
         ImageEditDetailsInput(
@@ -40,6 +39,7 @@ class _ImageSelectionWidgetState extends ConsumerState<ImageSelectionWidget> {
         ),
       );
     }
+    super.initState();
   }
 
   void _showModal() {
@@ -194,7 +194,7 @@ class _ImageSelectionModalState extends ConsumerState<ImageSelectionModal> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: insetsAll16,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [

@@ -1,74 +1,78 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mobile/src/shared/constants/app.sizes.dart';
-import 'package:mobile/src/shared/localization/string.hardcoded.dart';
 
-class LocationListWidget extends ConsumerStatefulWidget {
-  const LocationListWidget({
+import '../constants/app.sizes.dart';
+
+class InputListWidget extends ConsumerStatefulWidget {
+  const InputListWidget({
     Key? key,
-    required this.locations,
+    required this.items,
+    required this.label,
     required this.onChange,
   }) : super(key: key);
 
-  final List<String> locations;
+  final List<String> items;
+  final String label;
   final Function(List<String>) onChange;
 
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() => _LocationListWidgetState();
+  ConsumerState<ConsumerStatefulWidget> createState() => _InputListWidgetState();
 }
 
-class _LocationListWidgetState extends ConsumerState<LocationListWidget> {
-  final TextEditingController _addLocationController = TextEditingController();
-  final TextEditingController _editLocationController = TextEditingController();
-  final List<String> _locations = [];
+class _InputListWidgetState extends ConsumerState<InputListWidget> {
+  final TextEditingController _addItemController = TextEditingController();
+  final TextEditingController _editItemController = TextEditingController();
+  final List<String> _items = [];
   int _editingIndex = -1;
 
   @override
   void initState() {
-    for (var location in widget.locations) {
-      _locations.add(location);
+    for (var item in widget.items) {
+      _items.add(item);
     }
     super.initState();
   }
 
   @override
   void dispose() {
-    _addLocationController.dispose();
-    _editLocationController.dispose();
+    _addItemController.dispose();
+    _editItemController.dispose();
     super.dispose();
   }
 
-  void _addLocation(String location) {
-    setState(() {
-      _locations.add(location);
-      _addLocationController.clear();
-    });
-    widget.onChange(_locations);
+  void _addItem(String item) {
+    if (item.isNotEmpty) {
+      setState(() {
+        _items.add(item);
+        _addItemController.clear();
+      });
+      widget.onChange(_items);
+    }
   }
 
-  void _removeLocation(int index) {
+  void _removeItem(int index) {
     setState(() {
-      _locations.removeAt(index);
+      _items.removeAt(index);
     });
-    widget.onChange(_locations);
+    widget.onChange(_items);
   }
 
   void _startEditing(int index) {
     setState(() {
       _editingIndex = index;
-      _editLocationController.text = _locations[index];
+      _editItemController.text = _items[index];
     });
   }
 
   void _finishEditing() {
     setState(() {
-      if (_editingIndex >= 0 && _editingIndex < _locations.length) {
-        _locations[_editingIndex] = _editLocationController.text;
+      if (_editingIndex >= 0 && _editingIndex < _items.length) {
+        _items[_editingIndex] = _editItemController.text;
         _editingIndex = -1;
-        _editLocationController.clear();
+        _editItemController.clear();
       }
     });
-    widget.onChange(_locations);
+    widget.onChange(_items);
   }
 
   @override
@@ -79,18 +83,18 @@ class _LocationListWidgetState extends ConsumerState<LocationListWidget> {
           children: [
             Expanded(
               child: TextField(
-                controller: _addLocationController,
+                controller: _addItemController,
                 decoration: InputDecoration(
-                  hintText: 'Ingrese una ubicación'.hardcoded,
+                  hintText: widget.label,
                   suffixIcon: GestureDetector(
                     onTap: () {
-                      _addLocation(_addLocationController.text);
+                      _addItem(_addItemController.text);
                     },
                     child: const Icon(Icons.send),
                   ),
                 ),
                 onSubmitted: (value) {
-                  _addLocation(value);
+                  _addItem(value);
                 },
               ),
             ),
@@ -99,13 +103,13 @@ class _LocationListWidgetState extends ConsumerState<LocationListWidget> {
         gapH12,
         ListView.builder(
           shrinkWrap: true,
-          itemCount: _locations.length,
+          itemCount: _items.length,
           itemBuilder: (context, index) {
             final isEditing = _editingIndex == index;
             return isEditing
                 ? ListTile(
                     title: TextField(
-                      controller: _editLocationController,
+                      controller: _editItemController,
                       autofocus: true,
                       onSubmitted: (_) {
                         _finishEditing();
@@ -119,7 +123,7 @@ class _LocationListWidgetState extends ConsumerState<LocationListWidget> {
                     ),
                   )
                 : ListTile(
-                    title: Text(_locations[index]),
+                    title: Text(_items[index]),
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -132,7 +136,7 @@ class _LocationListWidgetState extends ConsumerState<LocationListWidget> {
                         IconButton(
                           icon: const Icon(Icons.delete),
                           onPressed: () {
-                            _removeLocation(index);
+                            _removeItem(index);
                           },
                         ),
                       ],

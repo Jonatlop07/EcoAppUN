@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:mobile/src/shared/common_widgets/navbar.dart';
+import '../../../../shared/common_widgets/navbar.dart';
+import '../../../../shared/localization/string.hardcoded.dart';
 import '../../../../shared/async/async_value_ui.dart';
 import '../../../../shared/common_widgets/done_button.dart';
 import '../../../../shared/common_widgets/responsive_scrollable_card.dart';
@@ -12,7 +13,7 @@ import '../../../../shared/routing/routes.dart';
 import '../../domain/catalog.dart';
 import '../common/image_edit_details.input.dart';
 import '../common/image_selection.widget.dart';
-import '../common/location_list.widget.dart';
+import '../../../../shared/common_widgets/input_list.widget.dart';
 import 'catalog_record_details.input.dart';
 import 'edit_catalog_record.controler.dart';
 import 'edit_catalog_record.state.dart';
@@ -215,8 +216,9 @@ class _EditCatalogRecordFormState extends ConsumerState<_EditCatalogRecordForm> 
                 validator: (commonName) =>
                     !_submitted ? null : state.descriptionErrorText(commonName ?? ''),
               ),
-              LocationListWidget(
-                locations: widget.catalogRecord.locations,
+              InputListWidget(
+                items: widget.catalogRecord.locations,
+                label: 'Ingrese una ubicación donde encontrarlo'.hardcoded,
                 onChange: handleOnLocationListChanged,
               ),
               Subtitle(text: state.sharePhotosText),

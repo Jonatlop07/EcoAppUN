@@ -1,4 +1,6 @@
 import 'package:dio/dio.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mobile/src/features/sowing/data/sowing_workshop_details.dart';
 import '../domain/sowing.dart';
 
 class SowingService {
@@ -27,9 +29,10 @@ class SowingService {
     }
   }
 
-  Future<void> createSowingWorkshop(SowingWorkshop workshop) async {
+  Future<String> createSowingWorkshop(SowingWorkshopDetails workshop) async {
     try {
       final response = await _dio.post('$baseUrl/sowing-workshops', data: workshop.toJson());
+      return response.data['sowing_workshop_id'];
     } catch (e) {
       throw Exception('Failed to create sowing workshop: $e');
     }
@@ -76,3 +79,7 @@ class SowingService {
     }
   }
 }
+
+final sowingServiceProvider = Provider<SowingService>((ref) {
+  return SowingService();
+});
