@@ -5,13 +5,13 @@ import 'package:mobile/src/shared/common_widgets/navbar.dart';
 import 'package:mobile/src/shared/localization/string.hardcoded.dart';
 import '../../../../shared/async/async_value_ui.dart';
 import '../../../../shared/common_widgets/done_button.dart';
+import '../../../../shared/common_widgets/input_list.dart';
 import '../../../../shared/common_widgets/responsive_scrollable_card.dart';
 import '../../../../shared/common_widgets/simple_text_form_field.dart';
 import '../../../../shared/common_widgets/subtitle.dart';
 import '../../../../shared/common_widgets/screen_title.dart';
 import '../../../../shared/routing/routes.dart';
 import '../common/image_edit_details.input.dart';
-import '../../../../shared/common_widgets/input_list.widget.dart';
 import 'catalog_record_details.input.dart';
 import 'create_catalog_record.controler.dart';
 import 'create_catalog_record.state.dart';
@@ -72,15 +72,15 @@ class _CreateCatalogRecordFormState extends ConsumerState<_CreateCatalogRecordFo
     super.dispose();
   }
 
-  void focusNextInput() {
+  void _focusNextInput() {
     _node.nextFocus();
   }
 
-  void handleOnLocationListChanged(List<String> locations) {
+  void _handleOnLocationListChanged(List<String> locations) {
     _locations = locations;
   }
 
-  void handleOnImagesUpdated(List<ImageEditDetailsInput> images) {
+  void _handleOnImagesUpdated(List<ImageEditDetailsInput> images) {
     _images = images;
   }
 
@@ -134,7 +134,7 @@ class _CreateCatalogRecordFormState extends ConsumerState<_CreateCatalogRecordFo
                 maxLines: state.textFieldMaxLines,
                 validator: (commonName) =>
                     !_submitted ? null : state.commonNameErrorText(commonName ?? ''),
-                onEditingComplete: focusNextInput,
+                onEditingComplete: _focusNextInput,
               ),
               SimpleTextFormField(
                 key: CreateCatalogRecordScreen.scientificNameKey,
@@ -148,7 +148,7 @@ class _CreateCatalogRecordFormState extends ConsumerState<_CreateCatalogRecordFo
                 maxLines: state.textFieldMaxLines,
                 validator: (scientificName) =>
                     !_submitted ? null : state.scientificNameErrorText(scientificName ?? ''),
-                onEditingComplete: focusNextInput,
+                onEditingComplete: _focusNextInput,
               ),
               SimpleTextFormField(
                 key: CreateCatalogRecordScreen.descriptionKey,
@@ -166,12 +166,12 @@ class _CreateCatalogRecordFormState extends ConsumerState<_CreateCatalogRecordFo
               InputListWidget(
                 items: const [],
                 label: 'Ingrese una ubicación donde encontrar a la especie'.hardcoded,
-                onChange: handleOnLocationListChanged,
+                onChange: _handleOnLocationListChanged,
               ),
               Subtitle(text: state.sharePhotosText),
               ImageSelectionWidget(
                 images: const [],
-                onImagesUpdated: handleOnImagesUpdated,
+                onImagesUpdated: _handleOnImagesUpdated,
               ),
               DoneButton(
                 isLoading: state.isLoading,

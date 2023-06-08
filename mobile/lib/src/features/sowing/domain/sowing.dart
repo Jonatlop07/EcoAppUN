@@ -1,5 +1,6 @@
 class SowingWorkshop {
   final String id;
+  final String authorId;
   final String title;
   final DateTime createdAt;
   final DateTime updatedAt;
@@ -9,12 +10,13 @@ class SowingWorkshop {
   final String description;
   final List<String> organizers;
   final List<Attendee> attendees;
-  final List<Instruction> instructions;
+  final List<String> instructions;
   final List<Seed> seeds;
   final List<Objective> objectives;
 
   SowingWorkshop({
     required this.id,
+    required this.authorId,
     required this.title,
     required this.createdAt,
     required this.updatedAt,
@@ -32,6 +34,7 @@ class SowingWorkshop {
   factory SowingWorkshop.fromJson(Map<String, dynamic> json) {
     return SowingWorkshop(
       id: json['id'],
+      authorId: json['author_id'],
       title: json['title'],
       createdAt: DateTime.parse(json['created_at']),
       updatedAt: DateTime.parse(json['updated_at']),
@@ -41,8 +44,7 @@ class SowingWorkshop {
       description: json['description'],
       organizers: List<String>.from(json['organizers']),
       attendees: List<Attendee>.from(json['attendees'].map((x) => Attendee.fromJson(x))),
-      instructions:
-          List<Instruction>.from(json['instructions'].map((x) => Instruction.fromJson(x))),
+      instructions: List<String>.from(json['instructions']),
       seeds: List<Seed>.from(json['seeds'].map((x) => Seed.fromJson(x))),
       objectives: List<Objective>.from(json['objectives'].map((x) => Objective.fromJson(x))),
     );
@@ -51,6 +53,7 @@ class SowingWorkshop {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
+      'author_id': authorId,
       'title': title,
       'created_at': createdAt.toIso8601String(),
       'updated_at': updatedAt.toIso8601String(),
@@ -60,7 +63,7 @@ class SowingWorkshop {
       'description': description,
       'organizers': organizers,
       'attendees': attendees.map((x) => x.toJson()).toList(),
-      'instructions': instructions.map((x) => x.toJson()).toList(),
+      'instructions': instructions,
       'seeds': seeds.map((x) => x.toJson()).toList(),
       'objectives': objectives.map((x) => x.toJson()).toList(),
     };
@@ -91,34 +94,6 @@ class Attendee {
       'id': id,
       'sowing_workshop_id': sowingWorkshopId,
       'seeds': seeds.map((x) => x.toJson()).toList(),
-    };
-  }
-}
-
-class Instruction {
-  final String id;
-  final String description;
-  final int sequence;
-
-  Instruction({
-    required this.id,
-    required this.description,
-    required this.sequence,
-  });
-
-  factory Instruction.fromJson(Map<String, dynamic> json) {
-    return Instruction(
-      id: json['id'],
-      description: json['description'],
-      sequence: json['sequence'],
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'description': description,
-      'sequence': sequence,
     };
   }
 }
@@ -156,32 +131,24 @@ class Seed {
 }
 
 class Objective {
-  final String id;
   final String description;
-  final int sequence;
   final bool isAchieved;
 
   Objective({
-    required this.id,
     required this.description,
-    required this.sequence,
     required this.isAchieved,
   });
 
   factory Objective.fromJson(Map<String, dynamic> json) {
     return Objective(
-      id: json['id'],
       description: json['description'],
-      sequence: json['sequence'],
       isAchieved: json['isAchieved'],
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'id': id,
       'description': description,
-      'sequence': sequence,
       'isAchieved': isAchieved,
     };
   }

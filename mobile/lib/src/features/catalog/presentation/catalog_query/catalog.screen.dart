@@ -1,10 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mobile/src/shared/common_widgets/navbar.dart';
-import 'package:mobile/src/shared/constants/app.sizes.dart';
-
-import '../../../../shared/common_widgets/screen_title.dart';
+import '../../../../shared/common_widgets/navbar.dart';
 import '../../../../shared/time/datetime.format.dart';
 import '../../../../shared/localization/string.hardcoded.dart';
 import '../../../../shared/common_widgets/async_value.dart';
@@ -28,7 +25,7 @@ class CatalogScreen extends ConsumerWidget {
   final Function(String) onDeleteCatalogRecord;
   final Function() onCreateNewCatalogRecord;
 
-  Future<void> handleOnDelete(
+  Future<void> _handleOnDelete(
     CatalogRecord catalogRecord,
     CatalogService catalogService,
   ) async {
@@ -115,7 +112,7 @@ class CatalogScreen extends ConsumerWidget {
                       break;
                     case CatalogRecordAction.delete:
                       {
-                        await handleOnDelete(catalogRecord, catalogService);
+                        await _handleOnDelete(catalogRecord, catalogService);
                       }
                       break;
                   }

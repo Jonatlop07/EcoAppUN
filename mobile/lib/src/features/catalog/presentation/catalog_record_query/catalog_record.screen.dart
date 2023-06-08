@@ -26,7 +26,7 @@ class CatalogRecordScreen extends ConsumerWidget {
   final Function onEditCatalogRecord;
   final Function onDeleteCatalogRecord;
 
-  Future<void> handleOnDelete(
+  Future<void> _handleOnDelete(
     CatalogRecord catalogRecord,
     CatalogService catalogService,
   ) async {
@@ -180,7 +180,7 @@ class CatalogRecordScreen extends ConsumerWidget {
                   gapH16,
                   PrimaryIconButton(
                     onPressed: () async {
-                      await handleOnDelete(catalogRecord, catalogService);
+                      await _handleOnDelete(catalogRecord, catalogService);
                     },
                     icon: const Icon(Icons.delete),
                     text: 'Eliminar'.hardcoded,

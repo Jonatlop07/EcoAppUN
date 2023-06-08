@@ -2,13 +2,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../shared/localization/string.hardcoded.dart';
 import '../../../../shared/validators/string.validator.dart';
 
-mixin CreateSowingWorkshopValidators {
+mixin EditSowingWorkshopValidators {
   final StringValidator titleSubmitValidator = NonEmptyStringValidator();
   final StringValidator descriptionSubmitValidator = NonEmptyStringValidator();
 }
 
-class CreateSowingWorkshopState with CreateSowingWorkshopValidators {
-  CreateSowingWorkshopState({
+class EditSowingWorkshopState with EditSowingWorkshopValidators {
+  EditSowingWorkshopState({
     this.value = const AsyncValue.data(''),
   });
 
@@ -16,8 +16,8 @@ class CreateSowingWorkshopState with CreateSowingWorkshopValidators {
 
   bool get isLoading => value.isLoading;
 
-  CreateSowingWorkshopState copyWith({AsyncValue<String>? value}) {
-    return CreateSowingWorkshopState(value: value ?? this.value);
+  EditSowingWorkshopState copyWith({AsyncValue<String>? value}) {
+    return EditSowingWorkshopState(value: value ?? this.value);
   }
 
   @override
@@ -26,14 +26,14 @@ class CreateSowingWorkshopState with CreateSowingWorkshopValidators {
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
-    return other is CreateSowingWorkshopState && other.value == value;
+    return other is EditSowingWorkshopState && other.value == value;
   }
 
   @override
   int get hashCode => value.hashCode;
 }
 
-extension CreateSowingWorkshopStateX on CreateSowingWorkshopState {
+extension EditSowingWorkshopStateX on EditSowingWorkshopState {
   int get textFieldMaxLength => 1024;
   int get textFieldMinLines => 1;
   int get textFieldMaxLines => 3;
@@ -79,14 +79,14 @@ extension CreateSowingWorkshopStateX on CreateSowingWorkshopState {
   }
 
   String get instructionsLabelText {
-    return 'Añade una instrucción a seguir'.hardcoded;
+    return 'Añade una nueva instrucción a seguir'.hardcoded;
   }
 
   String get objectivesLabelText {
-    return 'Añade un objetivo del taller'.hardcoded;
+    return 'Añade un nuevo objetivo del taller'.hardcoded;
   }
 
   String get organizersLabelText {
-    return 'Agrega un organizador'.hardcoded;
+    return 'Agrega un nuevo organizador'.hardcoded;
   }
 }

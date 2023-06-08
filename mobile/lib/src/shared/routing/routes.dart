@@ -5,5 +5,6 @@ class Routes {
   static const createCatalogRecord = 'createCatalogRecord';
   static const editCatalogRecord = 'editCatalogRecord';
   static const sowingWorkshops = 'sowingWorkshops';
+  static const querySowingWorkshop = 'querySowingWorkshop';
   static const createSowingWorkshop = 'createSowingWorkshop';
 }

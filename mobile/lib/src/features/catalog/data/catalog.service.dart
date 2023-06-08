@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mobile/src/features/catalog/presentation/edit_catalog_record/catalog_record_details.input.dart';
+import 'package:mobile/src/features/catalog/presentation/edit_catalog_record/catalog_record_edit_details.input.dart';
 import '../domain/catalog.dart';
 import 'catalog_record_details.dart';
 

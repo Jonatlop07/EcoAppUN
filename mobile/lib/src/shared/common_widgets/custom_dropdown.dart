@@ -3,10 +3,12 @@ import 'package:flutter/material.dart';
 class CustomDropdown extends StatefulWidget {
   const CustomDropdown({
     Key? key,
+    this.initialOptionIndex,
     required this.options,
     this.onSelected,
   }) : super(key: key);
 
+  final int? initialOptionIndex;
   final List<String> options;
   final Function(String)? onSelected;
 
@@ -20,9 +22,15 @@ class _CustomDropdownState extends State<CustomDropdown> {
   @override
   void initState() {
     if (widget.options.isNotEmpty) {
-      setState(() {
-        selectedOption = widget.options.first;
-      });
+      if (widget.initialOptionIndex != null) {
+        setState(() {
+          selectedOption = widget.options[widget.initialOptionIndex!];
+        });
+      } else {
+        setState(() {
+          selectedOption = widget.options.first;
+        });
+      }
     }
     super.initState();
   }

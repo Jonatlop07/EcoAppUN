@@ -13,8 +13,8 @@ import '../../../../shared/routing/routes.dart';
 import '../../domain/catalog.dart';
 import '../common/image_edit_details.input.dart';
 import '../common/image_selection.widget.dart';
-import '../../../../shared/common_widgets/input_list.widget.dart';
-import 'catalog_record_details.input.dart';
+import '../../../../shared/common_widgets/input_list.dart';
+import 'catalog_record_edit_details.input.dart';
 import 'edit_catalog_record.controler.dart';
 import 'edit_catalog_record.state.dart';
 
@@ -112,15 +112,15 @@ class _EditCatalogRecordFormState extends ConsumerState<_EditCatalogRecordForm> 
     super.dispose();
   }
 
-  void focusNextInput() {
+  void _focusNextInput() {
     _node.nextFocus();
   }
 
-  void handleOnLocationListChanged(List<String> locations) {
+  void _handleOnLocationListChanged(List<String> locations) {
     _locations = locations;
   }
 
-  void handleOnImagesUpdated(List<ImageEditDetailsInput> images) {
+  void _handleOnImagesUpdated(List<ImageEditDetailsInput> images) {
     _images = images;
   }
 
@@ -187,7 +187,7 @@ class _EditCatalogRecordFormState extends ConsumerState<_EditCatalogRecordForm> 
                 maxLines: state.textFieldMaxLines,
                 validator: (commonName) =>
                     !_submitted ? null : state.commonNameErrorText(commonName ?? ''),
-                onEditingComplete: focusNextInput,
+                onEditingComplete: _focusNextInput,
               ),
               SimpleTextFormField(
                 key: EditCatalogRecordScreen.scientificNameKey,
@@ -201,7 +201,7 @@ class _EditCatalogRecordFormState extends ConsumerState<_EditCatalogRecordForm> 
                 maxLines: state.textFieldMaxLines,
                 validator: (scientificName) =>
                     !_submitted ? null : state.scientificNameErrorText(scientificName ?? ''),
-                onEditingComplete: focusNextInput,
+                onEditingComplete: _focusNextInput,
               ),
               SimpleTextFormField(
                 key: EditCatalogRecordScreen.descriptionKey,
@@ -219,12 +219,12 @@ class _EditCatalogRecordFormState extends ConsumerState<_EditCatalogRecordForm> 
               InputListWidget(
                 items: widget.catalogRecord.locations,
                 label: 'Ingrese una ubicación donde encontrarlo'.hardcoded,
-                onChange: handleOnLocationListChanged,
+                onChange: _handleOnLocationListChanged,
               ),
               Subtitle(text: state.sharePhotosText),
               ImageSelectionWidget(
                 images: widget.catalogRecord.images,
-                onImagesUpdated: handleOnImagesUpdated,
+                onImagesUpdated: _handleOnImagesUpdated,
               ),
               DoneButton(
                 isLoading: state.isLoading,

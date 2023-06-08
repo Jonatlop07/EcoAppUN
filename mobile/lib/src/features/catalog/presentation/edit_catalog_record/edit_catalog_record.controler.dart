@@ -3,7 +3,7 @@ import 'package:mobile/src/features/catalog/data/catalog.service.dart';
 import 'package:mobile/src/shared/state/auth_state.accesor.dart';
 import 'package:mobile/src/shared/state/app_user.dart';
 import '../common/image_edit_details.input.dart';
-import 'catalog_record_details.input.dart';
+import 'catalog_record_edit_details.input.dart';
 import 'edit_catalog_record.state.dart';
 
 class EditCatalogRecordController extends StateNotifier<EditCatalogRecordState> {

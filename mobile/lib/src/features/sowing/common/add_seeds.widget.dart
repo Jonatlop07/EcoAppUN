@@ -16,7 +16,7 @@ class AddSeedWidget extends ConsumerStatefulWidget {
     required this.onSeedsUpdated,
   }) : super(key: key);
 
-  final List<Seed> seeds;
+  final List<SeedEditDetailsInput> seeds;
   final Function(List<SeedEditDetailsInput>) onSeedsUpdated;
 
   @override

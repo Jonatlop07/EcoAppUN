@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile/src/features/sowing/data/sowing_workshop_details.dart';
+import 'package:mobile/src/features/sowing/presentation/edit_sowing_workshop/sowing_workshop_edit_details.input.dart';
 import '../domain/sowing.dart';
 
 class SowingService {
@@ -38,11 +39,15 @@ class SowingService {
     }
   }
 
-  Future<void> updateSowingWorkshop(String id, SowingWorkshop workshop) async {
+  Future<String> updateSowingWorkshop(SowingWorkshopEditDetailsInput sowingWorkshop) async {
     try {
-      final response = await _dio.put('$baseUrl/sowing-workshops/$id', data: workshop.toJson());
+      final response = await _dio.put(
+        '$baseUrl/sowing-workshops/${sowingWorkshop.id}',
+        data: sowingWorkshop.toJson(),
+      );
+      return response.data['sowing_workshop_id'].toString();
     } catch (e) {
-      throw Exception('Failed to update sowing workshop with id $id: $e');
+      throw Exception('Failed to update sowing workshop with id ${sowingWorkshop.id}: $e');
     }
   }
 

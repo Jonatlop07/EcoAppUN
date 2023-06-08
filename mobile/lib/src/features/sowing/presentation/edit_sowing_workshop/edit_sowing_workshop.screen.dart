@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../shared/types/checkable_item.dart';
 import '../../../../shared/async/async_value_ui.dart';
 import '../../../../features/sowing/common/add_seeds.widget.dart';
 import '../../../../shared/common_widgets/custom_date_picker.dart';
 import '../../../../shared/common_widgets/custom_dropdown.dart';
-import '../../../../shared/localization/string.hardcoded.dart';
+import '../../../../shared/common_widgets/input_checklist.dart';
 import '../../../../shared/common_widgets/done_button.dart';
 import '../../../../shared/common_widgets/navbar.dart';
 import '../../../../shared/common_widgets/responsive_scrollable_card.dart';
@@ -13,19 +14,25 @@ import '../../../../shared/common_widgets/screen_title.dart';
 import '../../../../shared/common_widgets/simple_text_form_field.dart';
 import '../../../../shared/routing/routes.dart';
 import '../../../../shared/common_widgets/input_list.dart';
+import '../../domain/sowing.dart';
 import '../../common/seed_edit_details.input.dart';
-import 'create_sowing_workshop.controller.dart';
-import 'create_sowing_workshop.state.dart';
-import 'sowing_workshop_details.input.dart';
+import 'edit_sowing_workshop.controller.dart';
+import 'edit_sowing_workshop.state.dart';
+import 'sowing_workshop_edit_details.input.dart';
 
-class CreateSowingWorkshopScreen extends StatelessWidget {
-  const CreateSowingWorkshopScreen({Key? key}) : super(key: key);
+class EditSowingWorkshopScreen extends StatelessWidget {
+  const EditSowingWorkshopScreen({
+    Key? key,
+    required this.sowingWorkshop,
+  }) : super(key: key);
+
+  final SowingWorkshop sowingWorkshop;
 
   static const titleKey = Key('title');
   static const startTimeKey = Key('startTime');
   static const endTimeKey = Key('endTime');
   static const descriptionKey = Key('description');
-  static const meetingPointKey = Key('meetingPoint');
+  static const meetupPointKey = Key('meetupPoint');
   static const organizersKey = Key('organizers');
   static const objectivesKey = Key('objectives ');
   static const instructionsKey = Key('instructions ');
@@ -35,26 +42,32 @@ class CreateSowingWorkshopScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const NavBar(),
-      body: _CreateSowingWorkshopForm(
-        onSowingWorkshopCreated: (sowingWorkshopId) => context.pushNamed(Routes.sowingWorkshops),
+      body: _EditSowingWorkshopForm(
+        sowingWorkshop: sowingWorkshop,
+        onSowingWorkshopEdited: (sowingWorkshopId) => context.pushNamed(
+          Routes.querySowingWorkshop,
+          pathParameters: {"sowingWorkshopId": sowingWorkshopId},
+        ),
       ),
     );
   }
 }
 
-class _CreateSowingWorkshopForm extends ConsumerStatefulWidget {
-  const _CreateSowingWorkshopForm({
+class _EditSowingWorkshopForm extends ConsumerStatefulWidget {
+  const _EditSowingWorkshopForm({
     Key? key,
-    required this.onSowingWorkshopCreated,
+    required this.sowingWorkshop,
+    required this.onSowingWorkshopEdited,
   }) : super(key: key);
 
-  final Function(String) onSowingWorkshopCreated;
+  final SowingWorkshop sowingWorkshop;
+  final Function(String) onSowingWorkshopEdited;
 
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() => _CreateSowingWorkshopFormState();
+  ConsumerState<ConsumerStatefulWidget> createState() => _EditSowingWorkshopFormState();
 }
 
-class _CreateSowingWorkshopFormState extends ConsumerState<_CreateSowingWorkshopForm> {
+class _EditSowingWorkshopFormState extends ConsumerState<_EditSowingWorkshopForm> {
   final List<String> options = ['Aulas', 'La Che'];
 
   final _formKey = GlobalKey<FormState>();
@@ -68,15 +81,49 @@ class _CreateSowingWorkshopFormState extends ConsumerState<_CreateSowingWorkshop
   DateTime _startTime = DateTime.now();
   DateTime _endTime = DateTime.now();
 
-  String _meetingPoint = '';
+  String _meetupPoint = '';
 
   List<String> _organizers = [];
   List<String> _instructions = [];
-  List<String> _objectives = [];
+  List<Objective> _objectives = [];
 
   List<SeedEditDetailsInput> _seeds = [];
 
   var _submitted = false;
+
+  @override
+  void initState() {
+    for (var seed in widget.sowingWorkshop.seeds) {
+      _seeds.add(
+        SeedEditDetailsInput(
+          id: seed.id,
+          description: description,
+          imageLink: seed.imageLink,
+          availableAmount: seed.availableAmount,
+        ),
+      );
+    }
+    for (var organizer in widget.sowingWorkshop.organizers) {
+      _organizers.add(organizer);
+    }
+    for (var instruction in widget.sowingWorkshop.instructions) {
+      _instructions.add(instruction);
+    }
+    for (var objective in widget.sowingWorkshop.objectives) {
+      _objectives.add(objective);
+    }
+    super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    _titleController.text = widget.sowingWorkshop.title;
+    _descriptionController.text = widget.sowingWorkshop.description;
+    _startTime = widget.sowingWorkshop.startTime;
+    _endTime = widget.sowingWorkshop.endTime;
+    _meetupPoint = widget.sowingWorkshop.meetupPoint;
+    super.didChangeDependencies();
+  }
 
   @override
   void dispose() {
@@ -84,6 +131,10 @@ class _CreateSowingWorkshopFormState extends ConsumerState<_CreateSowingWorkshop
     _titleController.dispose();
     _descriptionController.dispose();
     super.dispose();
+  }
+
+  int _getMeetupPointOptionIndex(String meetupPoint) {
+    return options.indexOf(meetupPoint);
   }
 
   void _focusNextInput() {
@@ -98,8 +149,8 @@ class _CreateSowingWorkshopFormState extends ConsumerState<_CreateSowingWorkshop
     _endTime = endTime;
   }
 
-  void _handleOnSelectMeetingPoint(String meetingPoint) {
-    _meetingPoint = meetingPoint;
+  void _handleOnSelectMeetupPoint(String meetupPoint) {
+    _meetupPoint = meetupPoint;
   }
 
   void _handleOnSeedsUpdate(List<SeedEditDetailsInput> seeds) {
@@ -110,25 +161,36 @@ class _CreateSowingWorkshopFormState extends ConsumerState<_CreateSowingWorkshop
     _instructions = instructions;
   }
 
-  void _handleOnChangeObjectives(List<String> objectives) {
-    _objectives = objectives;
+  void _handleOnChangeObjectives(List<CheckableItem> objectives) {
+    _objectives = objectives
+        .map(
+          (objective) => Objective(
+            description: objective.description,
+            isAchieved: objective.isChecked,
+          ),
+        )
+        .toList();
   }
 
   void _handleOnChangeOrganizers(List<String> organizers) {
     _organizers = organizers;
   }
 
-  Future<void> _submit(CreateSowingWorkshopState state) async {
+  Future<void> _submit(EditSowingWorkshopState state) async {
     setState(() => _submitted = true);
     if (_formKey.currentState!.validate()) {
-      final controller = ref.read(createSowingWorkshopControllerProvider(null).notifier);
+      final controller = ref.read(editSowingWorkshopControllerProvider(null).notifier);
       final success = await controller.submit(
-        SowingWorkshopDetailsInput(
+        SowingWorkshopEditDetailsInput(
+          id: widget.sowingWorkshop.id,
+          authorId: widget.sowingWorkshop.authorId,
+          createdAt: widget.sowingWorkshop.createdAt,
+          updatedAt: widget.sowingWorkshop.updatedAt,
           title: title,
           description: description,
           startTime: _startTime,
           endTime: _endTime,
-          meetingPoint: _meetingPoint,
+          meetupPoint: _meetupPoint,
           objectives: _objectives,
           instructions: _instructions,
           organizers: _organizers,
@@ -137,7 +199,7 @@ class _CreateSowingWorkshopFormState extends ConsumerState<_CreateSowingWorkshop
       );
       if (success) {
         String sowingWorkshopId = state.value as String;
-        widget.onSowingWorkshopCreated.call(sowingWorkshopId);
+        widget.onSowingWorkshopEdited.call(sowingWorkshopId);
       }
     }
   }
@@ -145,10 +207,10 @@ class _CreateSowingWorkshopFormState extends ConsumerState<_CreateSowingWorkshop
   @override
   Widget build(BuildContext context) {
     ref.listen<AsyncValue>(
-      createSowingWorkshopControllerProvider(null).select((state) => state.value),
+      editSowingWorkshopControllerProvider(null).select((state) => state.value),
       (_, state) => state.showAlertDialogOnError(context),
     );
-    final state = ref.watch(createSowingWorkshopControllerProvider(null));
+    final state = ref.watch(editSowingWorkshopControllerProvider(null));
     return ResponsiveScrollableCard(
       child: FocusScope(
         node: _node,
@@ -160,7 +222,7 @@ class _CreateSowingWorkshopFormState extends ConsumerState<_CreateSowingWorkshop
                 text: state.formTitle,
               ),
               SimpleTextFormField(
-                key: CreateSowingWorkshopScreen.titleKey,
+                key: EditSowingWorkshopScreen.titleKey,
                 controller: _titleController,
                 decoration: InputDecoration(
                   hintText: state.titleHintText,
@@ -173,7 +235,7 @@ class _CreateSowingWorkshopFormState extends ConsumerState<_CreateSowingWorkshop
                 onEditingComplete: _focusNextInput,
               ),
               SimpleTextFormField(
-                key: CreateSowingWorkshopScreen.descriptionKey,
+                key: EditSowingWorkshopScreen.descriptionKey,
                 controller: _descriptionController,
                 decoration: InputDecoration(
                   hintText: state.descriptionHintText,
@@ -187,39 +249,49 @@ class _CreateSowingWorkshopFormState extends ConsumerState<_CreateSowingWorkshop
                 onEditingComplete: _focusNextInput,
               ),
               CustomDatePicker(
-                key: CreateSowingWorkshopScreen.startTimeKey,
+                key: EditSowingWorkshopScreen.startTimeKey,
+                initialDate: _startTime,
                 label: state.startTimeLabelText,
                 onDateSelected: _handleOnStartTimeChanged,
               ),
               CustomDatePicker(
-                key: CreateSowingWorkshopScreen.endTimeKey,
+                key: EditSowingWorkshopScreen.endTimeKey,
+                initialDate: _endTime,
                 label: state.endTimeLabelText,
                 onDateSelected: _handleOnEndTimeChanged,
               ),
               CustomDropdown(
-                key: CreateSowingWorkshopScreen.meetingPointKey,
+                key: EditSowingWorkshopScreen.meetupPointKey,
+                initialOptionIndex: _getMeetupPointOptionIndex(_meetupPoint),
                 options: options,
-                onSelected: _handleOnSelectMeetingPoint,
+                onSelected: _handleOnSelectMeetupPoint,
               ),
               AddSeedWidget(
-                seeds: const [],
+                seeds: _seeds,
                 onSeedsUpdated: _handleOnSeedsUpdate,
               ),
               InputListWidget(
-                key: CreateSowingWorkshopScreen.instructionsKey,
-                items: const [],
+                key: EditSowingWorkshopScreen.instructionsKey,
+                items: _instructions,
                 label: state.instructionsLabelText,
                 onChange: _handleOnChangeInstructions,
               ),
-              InputListWidget(
-                key: CreateSowingWorkshopScreen.objectivesKey,
-                items: const [],
+              InputChecklistWidget(
+                key: EditSowingWorkshopScreen.objectivesKey,
+                items: _objectives
+                    .map(
+                      (objective) => CheckableItem(
+                        description: objective.description,
+                        isChecked: objective.isAchieved,
+                      ),
+                    )
+                    .toList(),
                 label: state.objectivesLabelText,
                 onChange: _handleOnChangeObjectives,
               ),
               InputListWidget(
-                key: CreateSowingWorkshopScreen.organizersKey,
-                items: const [],
+                key: EditSowingWorkshopScreen.organizersKey,
+                items: _organizers,
                 label: state.organizersLabelText,
                 onChange: _handleOnChangeOrganizers,
               ),
