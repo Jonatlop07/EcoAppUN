@@ -4,7 +4,7 @@ class SowingWorkshopDetails {
   final DateTime startTime;
   final DateTime endTime;
   final String description;
-  final String meetingPoint;
+  final String meetupPoint;
   final List<String> organizers;
   final List<String> instructions;
   final List<String> objectives;
@@ -16,7 +16,7 @@ class SowingWorkshopDetails {
     required this.startTime,
     required this.endTime,
     required this.description,
-    required this.meetingPoint,
+    required this.meetupPoint,
     required this.organizers,
     required this.instructions,
     required this.objectives,
@@ -30,7 +30,7 @@ class SowingWorkshopDetails {
       'start_time': startTime,
       'end_time': endTime,
       'description': description,
-      'meeting_point': meetingPoint,
+      'meetup_point': meetupPoint,
       'organizers': organizers,
       'instructions': instructions,
       'objectives': objectives,

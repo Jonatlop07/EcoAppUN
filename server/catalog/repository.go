@@ -70,8 +70,11 @@ func (repository *MongoDBCatalogRepository) Update(catalogRecord CatalogRecord) 
 }
 
 func (repository *MongoDBCatalogRepository) Delete(id string) error {
-	modelId, _ := primitive.ObjectIDFromHex(id)
-	_, err := repository.CatalogRecordsCollection.DeleteOne(context.TODO(), bson.M{"_id": modelId})
+	modelId, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return err
+	}
+	_, err = repository.CatalogRecordsCollection.DeleteOne(context.TODO(), bson.M{"_id": modelId})
 	if err != nil {
 		return err
 	}

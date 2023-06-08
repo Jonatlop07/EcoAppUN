@@ -20,9 +20,8 @@ type SowingWorkshop struct {
 }
 
 type Attendee struct {
-	ID               string `bson:"_id" json:"id"`
-	SowingWorkshopID string `bson:"sowingWorkshopId" json:"sowing_workshop_id"`
-	Seeds            []Seed `bson:"seeds" json:"seeds"`
+	ID    string `bson:"_id" json:"id"`
+	Seeds []Seed `bson:"seeds" json:"seeds"`
 }
 
 type Seed struct {

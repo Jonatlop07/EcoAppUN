@@ -33,7 +33,7 @@ class CreateSowingWorkshopController extends StateNotifier<CreateSowingWorkshopS
       description: input.description,
       startTime: input.startTime,
       endTime: input.endTime,
-      meetingPoint: input.meetingPoint,
+      meetupPoint: input.meetupPoint,
       organizers: input.organizers,
       instructions: input.instructions,
       objectives: input.objectives,

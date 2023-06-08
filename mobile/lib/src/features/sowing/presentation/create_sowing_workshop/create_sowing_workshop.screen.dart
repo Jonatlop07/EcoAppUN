@@ -25,7 +25,7 @@ class CreateSowingWorkshopScreen extends StatelessWidget {
   static const startTimeKey = Key('startTime');
   static const endTimeKey = Key('endTime');
   static const descriptionKey = Key('description');
-  static const meetingPointKey = Key('meetingPoint');
+  static const meetupPointKey = Key('meetupPoint');
   static const organizersKey = Key('organizers');
   static const objectivesKey = Key('objectives ');
   static const instructionsKey = Key('instructions ');
@@ -68,7 +68,7 @@ class _CreateSowingWorkshopFormState extends ConsumerState<_CreateSowingWorkshop
   DateTime _startTime = DateTime.now();
   DateTime _endTime = DateTime.now();
 
-  String _meetingPoint = '';
+  String _meetupPoint = '';
 
   List<String> _organizers = [];
   List<String> _instructions = [];
@@ -98,8 +98,8 @@ class _CreateSowingWorkshopFormState extends ConsumerState<_CreateSowingWorkshop
     _endTime = endTime;
   }
 
-  void _handleOnSelectMeetingPoint(String meetingPoint) {
-    _meetingPoint = meetingPoint;
+  void _handleOnSelectMeetupPoint(String meetupPoint) {
+    _meetupPoint = meetupPoint;
   }
 
   void _handleOnSeedsUpdate(List<SeedEditDetailsInput> seeds) {
@@ -128,7 +128,7 @@ class _CreateSowingWorkshopFormState extends ConsumerState<_CreateSowingWorkshop
           description: description,
           startTime: _startTime,
           endTime: _endTime,
-          meetingPoint: _meetingPoint,
+          meetupPoint: _meetupPoint,
           objectives: _objectives,
           instructions: _instructions,
           organizers: _organizers,
@@ -197,9 +197,9 @@ class _CreateSowingWorkshopFormState extends ConsumerState<_CreateSowingWorkshop
                 onDateSelected: _handleOnEndTimeChanged,
               ),
               CustomDropdown(
-                key: CreateSowingWorkshopScreen.meetingPointKey,
+                key: CreateSowingWorkshopScreen.meetupPointKey,
                 options: options,
-                onSelected: _handleOnSelectMeetingPoint,
+                onSelected: _handleOnSelectMeetupPoint,
               ),
               AddSeedWidget(
                 seeds: const [],
