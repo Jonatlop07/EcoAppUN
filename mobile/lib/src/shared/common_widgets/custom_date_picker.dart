@@ -1,18 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:mobile/src/shared/localization/string.hardcoded.dart';
+import 'package:mobile/src/shared/common_widgets/custom_text.dart';
+import 'package:mobile/src/shared/common_widgets/secondary_icon_button.dart';
+import 'package:mobile/src/shared/constants/app.sizes.dart';
+
+import '../constants/app.colors.dart';
+import '../time/datetime.format.dart';
 
 class CustomDatePicker extends StatefulWidget {
   const CustomDatePicker({
     Key? key,
+    required this.label,
     this.initialDate,
     this.onDateSelected,
-    this.label,
   }) : super(key: key);
 
   final DateTime? initialDate;
   final Function(DateTime)? onDateSelected;
 
-  final String? label;
+  final String label;
 
   @override
   State<StatefulWidget> createState() => _MyDatePickerState();
@@ -22,15 +27,11 @@ class _MyDatePickerState extends State<CustomDatePicker> {
   late DateTime selectedDate;
 
   @override
-  void initState() {
-    super.initState();
-    selectedDate = DateTime.now();
-  }
-
-  @override
   void didChangeDependencies() {
     if (widget.initialDate != null) {
       selectedDate = widget.initialDate!;
+    } else {
+      selectedDate = DateTime.now();
     }
     super.didChangeDependencies();
   }
@@ -55,11 +56,22 @@ class _MyDatePickerState extends State<CustomDatePicker> {
   @override
   Widget build(BuildContext context) {
     return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Text('${widget.label}: ${selectedDate.toString()}'),
-        ElevatedButton(
+        CustomText(
+          text: widget.label,
+          textAlign: TextAlign.center,
+          textStyle: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                color: AppColors.darkestGreen,
+                fontWeight: FontWeight.w400,
+              ),
+        ),
+        gapH4,
+        SecondaryIconButton(
+          text: DateTimeFormat.toYYYYMMDD(selectedDate),
+          icon: const Icon(Icons.calendar_month_outlined),
           onPressed: () => _selectDate(context),
-          child: Text('Seleccione la fecha'.hardcoded),
         ),
       ],
     );

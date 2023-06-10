@@ -1,21 +1,25 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile/src/features/sowing/data/sowing_workshop_details.dart';
 import 'package:mobile/src/features/sowing/presentation/edit_sowing_workshop/sowing_workshop_edit_details.input.dart';
 import '../domain/sowing.dart';
 
 class SowingService {
-  final String baseUrl = 'https://api.example.com'; // Reemplaza con la URL correcta de la API
+  final String baseUrl = 'http://localhost:8083'; // Reemplaza con la URL correcta de la API
   final Dio _dio = Dio();
 
-  Future<List<SowingWorkshop>> getSowingWorkshops() async {
+  Future<List<SowingWorkshop>> getAllSowingWorkshops() async {
     try {
       final response = await _dio.get('$baseUrl/sowing-workshops');
-      final data = response.data as List<dynamic>;
-      final workshops = data.map((json) => SowingWorkshop.fromJson(json)).toList();
-      return workshops;
+      debugPrint('${response.data}');
+      return List<SowingWorkshop>.from(
+        response.data.map(
+          (sowingWorkshop) => SowingWorkshop.fromJson(sowingWorkshop),
+        ),
+      );
     } catch (e) {
-      throw Exception('Failed to retrieve sowing workshops: $e');
+      throw Exception('Failed to get all sowing workshops. Error: $e');
     }
   }
 
@@ -87,4 +91,8 @@ class SowingService {
 
 final sowingServiceProvider = Provider<SowingService>((ref) {
   return SowingService();
+});
+
+final getAllSowingWorkshopsProvider = FutureProvider<List<SowingWorkshop>>((ref) {
+  return ref.read(sowingServiceProvider).getAllSowingWorkshops();
 });

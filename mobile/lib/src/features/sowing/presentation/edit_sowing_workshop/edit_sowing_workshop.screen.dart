@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../shared/common_widgets/custom_time_of_day_picker.dart';
+import '../../../../shared/common_widgets/subtitle.dart';
+import '../../../../shared/constants/app.sizes.dart';
 import '../../../../shared/types/checkable_item.dart';
 import '../../../../shared/async/async_value_ui.dart';
 import '../../../../features/sowing/common/add_seeds.widget.dart';
@@ -11,7 +14,7 @@ import '../../../../shared/common_widgets/done_button.dart';
 import '../../../../shared/common_widgets/navbar.dart';
 import '../../../../shared/common_widgets/responsive_scrollable_card.dart';
 import '../../../../shared/common_widgets/screen_title.dart';
-import '../../../../shared/common_widgets/simple_text_form_field.dart';
+import '../../../../shared/common_widgets/custom_text_form_field.dart';
 import '../../../../shared/routing/routes.dart';
 import '../../../../shared/common_widgets/input_list.dart';
 import '../../domain/sowing.dart';
@@ -29,6 +32,7 @@ class EditSowingWorkshopScreen extends StatelessWidget {
   final SowingWorkshop sowingWorkshop;
 
   static const titleKey = Key('title');
+  static const dateKey = Key('date');
   static const startTimeKey = Key('startTime');
   static const endTimeKey = Key('endTime');
   static const descriptionKey = Key('description');
@@ -68,7 +72,7 @@ class _EditSowingWorkshopForm extends ConsumerStatefulWidget {
 }
 
 class _EditSowingWorkshopFormState extends ConsumerState<_EditSowingWorkshopForm> {
-  final List<String> options = ['Aulas', 'La Che'];
+  final List<String> options = ['Aulas', 'La Che', 'La Nacho'];
 
   final _formKey = GlobalKey<FormState>();
   final _node = FocusScopeNode();
@@ -78,8 +82,10 @@ class _EditSowingWorkshopFormState extends ConsumerState<_EditSowingWorkshopForm
   String get title => _titleController.text;
   String get description => _descriptionController.text;
 
-  DateTime _startTime = DateTime.now();
-  DateTime _endTime = DateTime.now();
+  DateTime _date = DateTime.now();
+
+  TimeOfDay _startTime = TimeOfDay.now();
+  TimeOfDay _endTime = TimeOfDay.now();
 
   String _meetupPoint = '';
 
@@ -141,11 +147,15 @@ class _EditSowingWorkshopFormState extends ConsumerState<_EditSowingWorkshopForm
     _node.nextFocus();
   }
 
-  void _handleOnStartTimeChanged(DateTime startTime) {
+  void _handleOnDateChanged(DateTime date) {
+    _date = date;
+  }
+
+  void _handleOnStartTimeChanged(TimeOfDay startTime) {
     _startTime = startTime;
   }
 
-  void _handleOnEndTimeChanged(DateTime endTime) {
+  void _handleOnEndTimeChanged(TimeOfDay endTime) {
     _endTime = endTime;
   }
 
@@ -188,6 +198,7 @@ class _EditSowingWorkshopFormState extends ConsumerState<_EditSowingWorkshopForm
           updatedAt: widget.sowingWorkshop.updatedAt,
           title: title,
           description: description,
+          date: _date,
           startTime: _startTime,
           endTime: _endTime,
           meetupPoint: _meetupPoint,
@@ -215,95 +226,152 @@ class _EditSowingWorkshopFormState extends ConsumerState<_EditSowingWorkshopForm
       child: FocusScope(
         node: _node,
         child: Form(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              ScreenTitle(
-                text: state.formTitle,
-              ),
-              SimpleTextFormField(
-                key: EditSowingWorkshopScreen.titleKey,
-                controller: _titleController,
-                decoration: InputDecoration(
-                  hintText: state.titleHintText,
-                  enabled: !state.isLoading,
+          child: Padding(
+            padding: insetsAll24,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: <Widget>[
+                ScreenTitle(text: state.formTitle),
+                gapH16,
+                Card(
+                  child: Padding(
+                    padding: insetsAll12,
+                    child: Column(
+                      children: [
+                        Subtitle(text: state.generalDetailsSubtitle),
+                        gapH4,
+                        CustomTextFormField(
+                          key: EditSowingWorkshopScreen.titleKey,
+                          controller: _titleController,
+                          decoration: InputDecoration(
+                            labelText: state.titleLabelText,
+                            hintText: state.titleHintText,
+                            enabled: !state.isLoading,
+                          ),
+                          maxLength: state.textFieldMaxLength,
+                          minLines: state.textFieldMinLines,
+                          maxLines: state.textFieldMaxLines,
+                          validator: (title) =>
+                              !_submitted ? null : state.titleErrorText(title ?? ''),
+                          onEditingComplete: _focusNextInput,
+                        ),
+                        CustomTextFormField(
+                          key: EditSowingWorkshopScreen.descriptionKey,
+                          controller: _descriptionController,
+                          decoration: InputDecoration(
+                            labelText: state.descriptionLabelText,
+                            hintText: state.descriptionHintText,
+                            enabled: !state.isLoading,
+                          ),
+                          maxLength: state.textFieldMaxLength,
+                          minLines: state.textFieldMinLines,
+                          maxLines: state.textFieldMaxLines,
+                          validator: (description) =>
+                              !_submitted ? null : state.descriptionErrorText(description ?? ''),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
-                maxLength: state.textFieldMaxLength,
-                minLines: state.textFieldMinLines,
-                maxLines: state.textFieldMaxLines,
-                validator: (title) => !_submitted ? null : state.titleErrorText(title ?? ''),
-                onEditingComplete: _focusNextInput,
-              ),
-              SimpleTextFormField(
-                key: EditSowingWorkshopScreen.descriptionKey,
-                controller: _descriptionController,
-                decoration: InputDecoration(
-                  hintText: state.descriptionHintText,
-                  enabled: !state.isLoading,
+                gapH16,
+                Card(
+                  child: Padding(
+                    padding: insetsAll16,
+                    child: Column(
+                      children: [
+                        Subtitle(text: state.logisticDetailsSubtitle),
+                        gapH20,
+                        CustomDatePicker(
+                          key: EditSowingWorkshopScreen.dateKey,
+                          initialDate: _date,
+                          label: state.dateLabelText,
+                          onDateSelected: _handleOnDateChanged,
+                        ),
+                        gapH20,
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            CustomTimeOfDayPicker(
+                              key: EditSowingWorkshopScreen.startTimeKey,
+                              initialTimeOfDay: _startTime,
+                              label: state.startTimeLabelText,
+                              onTimeOfDaySelected: _handleOnStartTimeChanged,
+                            ),
+                            CustomTimeOfDayPicker(
+                              key: EditSowingWorkshopScreen.endTimeKey,
+                              initialTimeOfDay: _startTime,
+                              label: state.endTimeLabelText,
+                              onTimeOfDaySelected: _handleOnEndTimeChanged,
+                            ),
+                          ],
+                        ),
+                        gapH16,
+                        CustomDropdown(
+                          key: EditSowingWorkshopScreen.meetupPointKey,
+                          initialOptionIndex: _getMeetupPointOptionIndex(_meetupPoint),
+                          label: state.meetupPointLabelText,
+                          options: options,
+                          onSelected: _handleOnSelectMeetupPoint,
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
-                maxLength: state.textFieldMaxLength,
-                minLines: state.textFieldMinLines,
-                maxLines: state.textFieldMaxLines,
-                validator: (description) =>
-                    !_submitted ? null : state.descriptionErrorText(description ?? ''),
-                onEditingComplete: _focusNextInput,
-              ),
-              CustomDatePicker(
-                key: EditSowingWorkshopScreen.startTimeKey,
-                initialDate: _startTime,
-                label: state.startTimeLabelText,
-                onDateSelected: _handleOnStartTimeChanged,
-              ),
-              CustomDatePicker(
-                key: EditSowingWorkshopScreen.endTimeKey,
-                initialDate: _endTime,
-                label: state.endTimeLabelText,
-                onDateSelected: _handleOnEndTimeChanged,
-              ),
-              CustomDropdown(
-                key: EditSowingWorkshopScreen.meetupPointKey,
-                initialOptionIndex: _getMeetupPointOptionIndex(_meetupPoint),
-                options: options,
-                onSelected: _handleOnSelectMeetupPoint,
-              ),
-              AddSeedWidget(
-                seeds: _seeds,
-                onSeedsUpdated: _handleOnSeedsUpdate,
-              ),
-              InputListWidget(
-                key: EditSowingWorkshopScreen.instructionsKey,
-                items: _instructions,
-                label: state.instructionsLabelText,
-                onChange: _handleOnChangeInstructions,
-              ),
-              InputChecklistWidget(
-                key: EditSowingWorkshopScreen.objectivesKey,
-                items: _objectives
-                    .map(
-                      (objective) => CheckableItem(
-                        description: objective.description,
-                        isChecked: objective.isAchieved,
-                      ),
-                    )
-                    .toList(),
-                label: state.objectivesLabelText,
-                onChange: _handleOnChangeObjectives,
-              ),
-              InputListWidget(
-                key: EditSowingWorkshopScreen.organizersKey,
-                items: _organizers,
-                label: state.organizersLabelText,
-                onChange: _handleOnChangeOrganizers,
-              ),
-              DoneButton(
-                isLoading: state.isLoading,
-                onPressed: state.isLoading
-                    ? null
-                    : () async {
-                        await _submit(state);
-                      },
-              ),
-            ],
+                gapH16,
+                InputListWidget(
+                  key: EditSowingWorkshopScreen.instructionsKey,
+                  items: _instructions,
+                  decoration: InputDecoration(
+                    labelText: state.instructionsLabelText,
+                    hintText: state.instructionsHintText,
+                    enabled: !state.isLoading,
+                  ),
+                  onChange: _handleOnChangeInstructions,
+                ),
+                gapH16,
+                InputChecklistWidget(
+                  key: EditSowingWorkshopScreen.objectivesKey,
+                  items: _objectives
+                      .map(
+                        (objective) => CheckableItem(
+                            description: objective.description, isChecked: objective.isAchieved),
+                      )
+                      .toList(),
+                  decoration: InputDecoration(
+                    labelText: state.objectivesLabelText,
+                    hintText: state.objectivesHintText,
+                    enabled: !state.isLoading,
+                  ),
+                  onChange: _handleOnChangeObjectives,
+                ),
+                gapH16,
+                InputListWidget(
+                  key: EditSowingWorkshopScreen.organizersKey,
+                  items: _organizers,
+                  decoration: InputDecoration(
+                    labelText: state.organizersLabelText,
+                    hintText: state.organizersHintText,
+                    enabled: !state.isLoading,
+                  ),
+                  onChange: _handleOnChangeOrganizers,
+                ),
+                gapH4,
+                AddSeedWidget(
+                  seeds: _seeds,
+                  onSeedsUpdated: _handleOnSeedsUpdate,
+                ),
+                gapH24,
+                DoneButton(
+                  isLoading: state.isLoading,
+                  onPressed: state.isLoading
+                      ? null
+                      : () async {
+                          await _submit(state);
+                        },
+                ),
+              ],
+            ),
           ),
         ),
       ),

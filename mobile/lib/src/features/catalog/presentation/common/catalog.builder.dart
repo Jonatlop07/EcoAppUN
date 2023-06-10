@@ -19,12 +19,13 @@ class CatalogBuilder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String screenTitle = 'Catálogo de especies'.hardcoded;
     if (catalogRecords.isEmpty) {
       return ResponsiveCenter(
         child: Column(
           children: [
             gapH20,
-            ScreenTitle(text: 'Catálogo de especies'.hardcoded),
+            ScreenTitle(text: screenTitle),
             gapH16,
             Text('Ningún artículo del catálogo ha sido creado hasta el momento.'.hardcoded),
           ],
@@ -37,15 +38,17 @@ class CatalogBuilder extends StatelessWidget {
         padding: insetsH4,
         child: Column(
           children: [
-            ScreenTitle(text: 'Catálogo de especies'.hardcoded),
+            ScreenTitle(text: screenTitle),
             gapH16,
-            ListView.builder(
-              padding: insetsV4,
-              itemBuilder: (context, index) {
-                final item = catalogRecords[index];
-                return catalogRecordBuilder(context, item, index);
-              },
-              itemCount: catalogRecords.length,
+            Expanded(
+              child: ListView.builder(
+                padding: insetsV4,
+                itemBuilder: (context, index) {
+                  final item = catalogRecords[index];
+                  return catalogRecordBuilder(context, item, index);
+                },
+                itemCount: catalogRecords.length,
+              ),
             )
           ],
         ),
@@ -54,11 +57,11 @@ class CatalogBuilder extends StatelessWidget {
     return Column(
       children: [
         gapH20,
-        ScreenTitle(text: 'Catálogo de especies'.hardcoded),
+        ScreenTitle(text: screenTitle),
         gapH16,
         Expanded(
           child: ListView.builder(
-            padding: insetsH4,
+            padding: insetsAll4,
             itemBuilder: (context, index) {
               final item = catalogRecords[index];
               return catalogRecordBuilder(context, item, index);

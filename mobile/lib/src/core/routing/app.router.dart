@@ -1,11 +1,15 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile/src/features/catalog/presentation/edit_catalog_record/edit_catalog_record.screen.dart';
+import 'package:mobile/src/features/sowing/domain/sowing.dart';
 import 'package:mobile/src/features/sowing/presentation/create_sowing_workshop/create_sowing_workshop.screen.dart';
 import '../../features/catalog/domain/catalog.dart';
 import '../../features/catalog/presentation/catalog_query/catalog.screen.dart';
 import '../../features/catalog/presentation/catalog_record_query/catalog_record.screen.dart';
 import '../../features/catalog/presentation/create_catalog_record/create_catalog_record.screen.dart';
+import '../../features/sowing/presentation/edit_sowing_workshop/edit_sowing_workshop.screen.dart';
+import '../../features/sowing/presentation/query_sowing_workshop/sowing_workshop.screen.dart';
+import '../../features/sowing/presentation/sowing_workshops_feed/sowing_workshops_feed.screen.dart';
 import '../../shared/routing/routes.dart';
 import 'not_found.screen.dart';
 import 'transition.screen.dart';
@@ -17,14 +21,86 @@ final goRouterProvider = Provider<GoRouter>((ref) {
     routes: [
       GoRoute(
         path: '/',
-        name: Routes.createSowingWorkshop,
+        name: Routes.sowingWorkshops,
         pageBuilder: (context, state) => TransitionScreen.createFade(
           context,
           state,
-          const CreateSowingWorkshopScreen(),
+          SowingWorkshopsFeedScreen(
+            onSowingWorkshopSelected: (SowingWorkshop sowingWorkshop) {
+              context.pushNamed(
+                Routes.querySowingWorkshop,
+                pathParameters: {"sowingWorkshopId": sowingWorkshop.id},
+                extra: sowingWorkshop.toJson(),
+              );
+            },
+            onEditSowingWorkshop: (SowingWorkshop sowingWorkshop) {
+              context.pushNamed(
+                Routes.editSowingWorkshop,
+                pathParameters: {"sowingWorkshopId": sowingWorkshop.id},
+                extra: sowingWorkshop.toJson(),
+              );
+            },
+            onDeleteSowingWorkshop: (String sowingWorkshopId) {
+              context.pushNamed(Routes.sowingWorkshops);
+            },
+            onCreateNewSowingWorkshop: () {
+              context.pushNamed(Routes.createSowingWorkshop);
+            },
+          ),
         ),
-      )
-      /*  GoRoute(
+        routes: [
+          GoRoute(
+            path: 'create',
+            name: Routes.createSowingWorkshop,
+            pageBuilder: (context, state) => TransitionScreen.createFade(
+              context,
+              state,
+              const CreateSowingWorkshopScreen(),
+            ),
+          ),
+          GoRoute(
+            path: 'edit/:sowingWorkshopId',
+            name: Routes.editSowingWorkshop,
+            pageBuilder: (context, state) {
+              final data = state.extra as Map<String, dynamic>;
+              SowingWorkshop sowingWorkshop = SowingWorkshop.fromJson(data);
+              return TransitionScreen.createFade(
+                context,
+                state,
+                EditSowingWorkshopScreen(
+                  sowingWorkshop: sowingWorkshop,
+                ),
+              );
+            },
+          ),
+          GoRoute(
+            path: ':sowingWorkshopId',
+            name: Routes.querySowingWorkshop,
+            pageBuilder: (context, state) {
+              final data = state.extra as Map<String, dynamic>;
+              SowingWorkshop sowingWorkshop = SowingWorkshop.fromJson(data);
+              return TransitionScreen.createFade(
+                context,
+                state,
+                SowingWorkshopScreen(
+                  sowingWorkshop: sowingWorkshop,
+                  onEditSowingWorkshop: (SowingWorkshop sowingWorkshop) {
+                    context.pushNamed(
+                      Routes.editSowingWorkshop,
+                      pathParameters: {"sowingWorkshopId": sowingWorkshop.id},
+                      extra: sowingWorkshop.toJson(),
+                    );
+                  },
+                  onDeleteSowingWorkshop: (String sowingWorkshopId) {
+                    context.pushNamed(Routes.sowingWorkshops);
+                  },
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+      /*GoRoute(
         path: '/',
         name: Routes.catalog,
         pageBuilder: (context, state) => TransitionScreen.createFade(
@@ -104,8 +180,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             },
           ),
         ],
-      ),
-    */
+      ),*/
     ],
     errorBuilder: (context, state) => const NotFoundScreen(),
   );

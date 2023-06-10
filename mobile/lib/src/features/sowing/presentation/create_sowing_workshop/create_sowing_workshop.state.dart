@@ -42,8 +42,16 @@ extension CreateSowingWorkshopStateX on CreateSowingWorkshopState {
     return 'Nuevo taller de siembra'.hardcoded;
   }
 
-  String get titleHintText {
+  String get generalDetailsSubtitle {
+    return 'Datos generales'.hardcoded;
+  }
+
+  String get titleLabelText {
     return 'Título'.hardcoded;
+  }
+
+  String get titleHintText {
+    return 'Ingresa un título descriptivo del taller'.hardcoded;
   }
 
   bool canSubmitTitle(String title) {
@@ -56,8 +64,12 @@ extension CreateSowingWorkshopStateX on CreateSowingWorkshopState {
     return showErrorText ? errorText : null;
   }
 
+  String get descriptionLabelText {
+    return 'Descripción'.hardcoded;
+  }
+
   String get descriptionHintText {
-    return 'Descripción del taller'.hardcoded;
+    return 'Describe las características principales del taller'.hardcoded;
   }
 
   bool canSubmitDescription(String description) {
@@ -70,23 +82,47 @@ extension CreateSowingWorkshopStateX on CreateSowingWorkshopState {
     return showErrorText ? errorText : null;
   }
 
+  String get logisticDetailsSubtitle {
+    return 'Datos logísticos'.hardcoded;
+  }
+
+  String get dateLabelText {
+    return 'Fecha de realización'.hardcoded;
+  }
+
   String get startTimeLabelText {
-    return 'Inicia:'.hardcoded;
+    return 'Inicia'.hardcoded;
   }
 
   String get endTimeLabelText {
     return 'Finaliza'.hardcoded;
   }
 
+  String get meetupPointLabelText {
+    return 'Punto de encuentro'.hardcoded;
+  }
+
   String get instructionsLabelText {
+    return 'Instrucciones del taller'.hardcoded;
+  }
+
+  String get instructionsHintText {
     return 'Añade una instrucción a seguir'.hardcoded;
   }
 
   String get objectivesLabelText {
+    return 'Objetivos del taller'.hardcoded;
+  }
+
+  String get objectivesHintText {
     return 'Añade un objetivo del taller'.hardcoded;
   }
 
   String get organizersLabelText {
+    return 'Organizadores'.hardcoded;
+  }
+
+  String get organizersHintText {
     return 'Agrega un organizador'.hardcoded;
   }
 }

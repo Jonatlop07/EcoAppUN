@@ -7,4 +7,5 @@ class Routes {
   static const sowingWorkshops = 'sowingWorkshops';
   static const querySowingWorkshop = 'querySowingWorkshop';
   static const createSowingWorkshop = 'createSowingWorkshop';
+  static const editSowingWorkshop = 'editSowingWorkshop';
 }

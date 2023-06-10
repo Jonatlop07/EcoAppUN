@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 import '../../common/seed_edit_details.input.dart';
 import '../../domain/sowing.dart';
 
@@ -7,8 +9,9 @@ class SowingWorkshopEditDetailsInput {
   final DateTime createdAt;
   final DateTime updatedAt;
   final String title;
-  final DateTime startTime;
-  final DateTime endTime;
+  final DateTime date;
+  final TimeOfDay startTime;
+  final TimeOfDay endTime;
   final String description;
   final String meetupPoint;
   final List<String> organizers;
@@ -22,6 +25,7 @@ class SowingWorkshopEditDetailsInput {
     required this.createdAt,
     required this.updatedAt,
     required this.title,
+    required this.date,
     required this.startTime,
     required this.endTime,
     required this.description,
@@ -33,14 +37,29 @@ class SowingWorkshopEditDetailsInput {
   });
 
   Map<String, dynamic> toJson() {
+    DateTime startDate = DateTime(
+      date.year,
+      date.month,
+      date.day,
+      startTime.hour,
+      startTime.minute,
+    );
+    DateTime endDate = DateTime(
+      date.year,
+      date.month,
+      date.day,
+      endTime.hour,
+      endTime.minute,
+    );
     return {
       'id': id,
       'author_id': authorId,
       'created_at': createdAt.toIso8601String(),
       'updated_at': updatedAt.toIso8601String(),
       'title': title,
-      'start_time': startTime,
-      'end_time': endTime,
+      'date': date.toIso8601String(),
+      'start_time': startDate.toIso8601String(),
+      'end_time': endDate.toIso8601String(),
       'description': description,
       'meetup_point': meetupPoint,
       'organizers': organizers,

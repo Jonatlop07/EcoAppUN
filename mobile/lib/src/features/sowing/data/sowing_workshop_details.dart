@@ -1,8 +1,11 @@
+import 'package:flutter/material.dart';
+
 class SowingWorkshopDetails {
   final String authorId;
   final String title;
-  final DateTime startTime;
-  final DateTime endTime;
+  final DateTime date;
+  final TimeOfDay startTime;
+  final TimeOfDay endTime;
   final String description;
   final String meetupPoint;
   final List<String> organizers;
@@ -13,6 +16,7 @@ class SowingWorkshopDetails {
   SowingWorkshopDetails({
     required this.authorId,
     required this.title,
+    required this.date,
     required this.startTime,
     required this.endTime,
     required this.description,
@@ -24,11 +28,26 @@ class SowingWorkshopDetails {
   });
 
   Map<String, dynamic> toJson() {
+    DateTime startDate = DateTime(
+      date.year,
+      date.month,
+      date.day,
+      startTime.hour,
+      startTime.minute,
+    );
+    DateTime endDate = DateTime(
+      date.year,
+      date.month,
+      date.day,
+      endTime.hour,
+      endTime.minute,
+    );
     return {
       'author_id': authorId,
       'title': title,
-      'start_time': startTime,
-      'end_time': endTime,
+      'date': date.toIso8601String(),
+      'start_time': startDate.toIso8601String(),
+      'end_time': endDate.toIso8601String(),
       'description': description,
       'meetup_point': meetupPoint,
       'organizers': organizers,

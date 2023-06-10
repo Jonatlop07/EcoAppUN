@@ -121,7 +121,10 @@ class _ImageSelectionWidgetState extends ConsumerState<ImageSelectionWidget> {
         Card(
           child: ListTile(
             leading: const Icon(Icons.add),
-            title: Text('Añadir imagen'.hardcoded),
+            title: Text(
+              'Añadir imagen'.hardcoded,
+              style: Theme.of(context).textTheme.bodyLarge,
+            ),
             onTap: _showModal,
           ),
         ),

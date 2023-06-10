@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class SimpleTextFormField extends StatelessWidget {
-  const SimpleTextFormField({
+class CustomTextFormField extends StatelessWidget {
+  const CustomTextFormField({
     required Key? key,
     required this.decoration,
     required this.maxLength,
@@ -36,6 +36,7 @@ class SimpleTextFormField extends StatelessWidget {
       keyboardType: TextInputType.multiline,
       keyboardAppearance: Brightness.light,
       onEditingComplete: onEditingComplete,
+      style: Theme.of(context).textTheme.bodyMedium,
     );
   }
 }

@@ -7,12 +7,12 @@ class InputListWidget extends ConsumerStatefulWidget {
   const InputListWidget({
     Key? key,
     required this.items,
-    required this.label,
+    required this.decoration,
     required this.onChange,
   }) : super(key: key);
 
   final List<String> items;
-  final String label;
+  final InputDecoration decoration;
   final Function(List<String>) onChange;
 
   @override
@@ -77,74 +77,82 @@ class _InputListWidgetState extends ConsumerState<InputListWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Row(
+    return Card(
+      child: Padding(
+        padding: insetsH16,
+        child: Column(
           children: [
-            Expanded(
-              child: TextField(
-                controller: _addItemController,
-                decoration: InputDecoration(
-                  hintText: widget.label,
-                  suffixIcon: GestureDetector(
-                    onTap: () {
-                      _addItem(_addItemController.text);
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _addItemController,
+                    decoration: widget.decoration.copyWith(
+                      suffixIcon: GestureDetector(
+                        onTap: () {
+                          _addItem(_addItemController.text);
+                        },
+                        child: const Icon(Icons.send),
+                      ),
+                    ),
+                    onSubmitted: (value) {
+                      _addItem(value);
                     },
-                    child: const Icon(Icons.send),
                   ),
                 ),
-                onSubmitted: (value) {
-                  _addItem(value);
-                },
-              ),
+              ],
+            ),
+            gapH12,
+            ListView.builder(
+              shrinkWrap: true,
+              itemCount: _items.length,
+              itemBuilder: (context, index) {
+                final isEditing = _editingIndex == index;
+                return isEditing
+                    ? ListTile(
+                        title: TextField(
+                          controller: _editItemController,
+                          autofocus: true,
+                          onSubmitted: (_) {
+                            _finishEditing();
+                          },
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
+                        trailing: IconButton(
+                          icon: const Icon(Icons.check),
+                          onPressed: () {
+                            _finishEditing();
+                          },
+                        ),
+                      )
+                    : ListTile(
+                        title: Text(
+                          _items[index],
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.edit),
+                              onPressed: () {
+                                _startEditing(index);
+                              },
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.delete),
+                              onPressed: () {
+                                _removeItem(index);
+                              },
+                            ),
+                          ],
+                        ),
+                      );
+              },
             ),
           ],
         ),
-        gapH12,
-        ListView.builder(
-          shrinkWrap: true,
-          itemCount: _items.length,
-          itemBuilder: (context, index) {
-            final isEditing = _editingIndex == index;
-            return isEditing
-                ? ListTile(
-                    title: TextField(
-                      controller: _editItemController,
-                      autofocus: true,
-                      onSubmitted: (_) {
-                        _finishEditing();
-                      },
-                    ),
-                    trailing: IconButton(
-                      icon: const Icon(Icons.check),
-                      onPressed: () {
-                        _finishEditing();
-                      },
-                    ),
-                  )
-                : ListTile(
-                    title: Text(_items[index]),
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.edit),
-                          onPressed: () {
-                            _startEditing(index);
-                          },
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.delete),
-                          onPressed: () {
-                            _removeItem(index);
-                          },
-                        ),
-                      ],
-                    ),
-                  );
-          },
-        ),
-      ],
+      ),
     );
   }
 }

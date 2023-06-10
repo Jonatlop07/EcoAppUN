@@ -31,6 +31,7 @@ class EditSowingWorkshopController extends StateNotifier<EditSowingWorkshopState
       authorId: input.authorId,
       title: input.title,
       description: input.description,
+      date: input.date,
       startTime: input.startTime,
       endTime: input.endTime,
       meetupPoint: input.meetupPoint,

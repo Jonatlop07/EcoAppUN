@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mobile/src/features/sowing/common/seed_edit_details.input.dart';
-import 'package:mobile/src/features/sowing/domain/sowing.dart';
 import 'package:mobile/src/shared/constants/app.sizes.dart';
 import 'package:mobile/src/shared/localization/string.hardcoded.dart';
 
@@ -127,7 +126,10 @@ class _AddSeedWidgetState extends ConsumerState<AddSeedWidget> {
         Card(
           child: ListTile(
             leading: const Icon(Icons.add),
-            title: Text('Añade los detalles de un tipo de semilla'.hardcoded),
+            title: Text(
+              'Añade los detalles de un tipo de semilla a plantar'.hardcoded,
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
             onTap: _showModal,
           ),
         ),

@@ -5,6 +5,7 @@ import "time"
 type SowingWorkshopDetails struct {
 	AuthorID     string        `bson:"authorId" json:"author_id"`
 	Title        string        `bson:"title" json:"title"`
+	Date         time.Time     `bson:"date" json:"date"`
 	StartTime    time.Time     `bson:"startTime" json:"start_time"`
 	EndTime      time.Time     `bson:"endTime" json:"end_time"`
 	Description  string        `bson:"description" json:"description"`

@@ -8,12 +8,12 @@ class InputChecklistWidget extends ConsumerStatefulWidget {
   const InputChecklistWidget({
     Key? key,
     required this.items,
-    required this.label,
+    required this.decoration,
     required this.onChange,
   }) : super(key: key);
 
   final List<CheckableItem> items;
-  final String label;
+  final InputDecoration decoration;
   final Function(List<CheckableItem>) onChange;
 
   @override
@@ -89,80 +89,87 @@ class _InputChecklistWidgetState extends ConsumerState<InputChecklistWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Row(
+    return Card(
+      child: Padding(
+        padding: insetsH16,
+        child: Column(
           children: [
-            Expanded(
-              child: TextField(
-                controller: _addItemController,
-                decoration: InputDecoration(
-                  hintText: widget.label,
-                  suffixIcon: GestureDetector(
-                    onTap: () {
-                      _addItem(_addItemController.text);
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _addItemController,
+                    decoration: widget.decoration.copyWith(
+                      suffixIcon: GestureDetector(
+                        onTap: () {
+                          _addItem(_addItemController.text);
+                        },
+                        child: const Icon(Icons.send),
+                      ),
+                    ),
+                    onSubmitted: (value) {
+                      _addItem(value);
                     },
-                    child: const Icon(Icons.send),
                   ),
                 ),
-                onSubmitted: (value) {
-                  _addItem(value);
-                },
-              ),
+              ],
             ),
-          ],
-        ),
-        gapH12,
-        ListView.builder(
-          shrinkWrap: true,
-          itemCount: _items.length,
-          itemBuilder: (context, index) {
-            final isEditing = _editingIndex == index;
-            return isEditing
-                ? ListTile(
-                    title: TextField(
-                      controller: _editItemController,
-                      autofocus: true,
-                      onSubmitted: (_) {
-                        _finishEditing();
-                      },
-                    ),
-                    trailing: IconButton(
-                      icon: const Icon(Icons.check),
-                      onPressed: () {
-                        _finishEditing();
-                      },
-                    ),
-                  )
-                : ListTile(
-                    title: Text(_items[index].description),
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Checkbox(
+            gapH12,
+            ListView.builder(
+              shrinkWrap: true,
+              itemCount: _items.length,
+              itemBuilder: (context, index) {
+                final isEditing = _editingIndex == index;
+                return isEditing
+                    ? ListTile(
+                        title: TextField(
+                          controller: _editItemController,
+                          autofocus: true,
+                          onSubmitted: (_) {
+                            _finishEditing();
+                          },
+                        ),
+                        trailing: IconButton(
+                          icon: const Icon(Icons.check),
+                          onPressed: () {
+                            _finishEditing();
+                          },
+                        ),
+                      )
+                    : ListTile(
+                        title: Text(
+                          _items[index].description,
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.edit),
+                              onPressed: () {
+                                _startEditing(index);
+                              },
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.delete),
+                              onPressed: () {
+                                _removeItem(index);
+                              },
+                            ),
+                          ],
+                        ),
+                        leading: Checkbox(
                           value: _items[index].isChecked,
                           onChanged: (bool? isChecked) {
                             _onCheckItem(index, isChecked!);
                           },
                         ),
-                        IconButton(
-                          icon: const Icon(Icons.edit),
-                          onPressed: () {
-                            _startEditing(index);
-                          },
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.delete),
-                          onPressed: () {
-                            _removeItem(index);
-                          },
-                        ),
-                      ],
-                    ),
-                  );
-          },
+                      );
+              },
+            ),
+          ],
         ),
-      ],
+      ),
     );
   }
 }

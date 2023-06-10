@@ -44,8 +44,12 @@ extension EditCatalogRecordStateX on EditCatalogRecordState {
     return 'Editar ficha de especie'.hardcoded;
   }
 
-  String get commonNameHintText {
+  String get commonNameLabelText {
     return 'Nombre común'.hardcoded;
+  }
+
+  String get commonNameHintText {
+    return 'Nombre común de la especie'.hardcoded;
   }
 
   bool canSubmitCommonName(String commonName) {
@@ -58,8 +62,12 @@ extension EditCatalogRecordStateX on EditCatalogRecordState {
     return showErrorText ? errorText : null;
   }
 
-  String get scientificNameHintText {
+  String get scientificNameLabelText {
     return 'Nombre científico'.hardcoded;
+  }
+
+  String get scientificNameHintText {
+    return 'Nombre científico de la especie'.hardcoded;
   }
 
   bool canSubmitScientificName(String scientificName) {
@@ -70,6 +78,10 @@ extension EditCatalogRecordStateX on EditCatalogRecordState {
     final bool showErrorText = !canSubmitScientificName(scientificName);
     final String errorText = 'Debes indicar el nombre científico de la especie'.hardcoded;
     return showErrorText ? errorText : null;
+  }
+
+  String get descriptionLabelText {
+    return 'Descripcion de la especie'.hardcoded;
   }
 
   String get descriptionHintText {
@@ -84,6 +96,14 @@ extension EditCatalogRecordStateX on EditCatalogRecordState {
     final bool showErrorText = !canSubmitDescription(description);
     final String errorText = 'Debes indicar la descripción de la especie'.hardcoded;
     return showErrorText ? errorText : null;
+  }
+
+  String get locationsLabelText {
+    return 'Ubicaciones'.hardcoded;
+  }
+
+  String get locationsHintText {
+    return 'Lugares donde encontrar esta especie'.hardcoded;
   }
 
   String get sharePhotosText {

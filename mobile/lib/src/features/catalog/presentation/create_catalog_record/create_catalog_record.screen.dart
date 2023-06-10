@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile/src/shared/common_widgets/navbar.dart';
+import 'package:mobile/src/shared/constants/app.sizes.dart';
 import 'package:mobile/src/shared/localization/string.hardcoded.dart';
 import '../../../../shared/async/async_value_ui.dart';
 import '../../../../shared/common_widgets/done_button.dart';
 import '../../../../shared/common_widgets/input_list.dart';
 import '../../../../shared/common_widgets/responsive_scrollable_card.dart';
-import '../../../../shared/common_widgets/simple_text_form_field.dart';
+import '../../../../shared/common_widgets/custom_text_form_field.dart';
 import '../../../../shared/common_widgets/subtitle.dart';
 import '../../../../shared/common_widgets/screen_title.dart';
 import '../../../../shared/routing/routes.dart';
@@ -118,70 +119,96 @@ class _CreateCatalogRecordFormState extends ConsumerState<_CreateCatalogRecordFo
         node: _node,
         child: Form(
           key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              ScreenTitle(text: state.formTitle),
-              SimpleTextFormField(
-                key: CreateCatalogRecordScreen.commonNameKey,
-                controller: _commonNameController,
-                decoration: InputDecoration(
-                  hintText: state.commonNameHintText,
-                  enabled: !state.isLoading,
+          child: Padding(
+            padding: insetsAll24,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: <Widget>[
+                ScreenTitle(text: state.formTitle),
+                gapH12,
+                Card(
+                  child: Padding(
+                    padding: insetsAll12,
+                    child: Column(
+                      children: [
+                        CustomTextFormField(
+                          key: CreateCatalogRecordScreen.commonNameKey,
+                          controller: _commonNameController,
+                          decoration: InputDecoration(
+                            labelText: state.commonNameLabelText,
+                            hintText: state.commonNameHintText,
+                            enabled: !state.isLoading,
+                          ),
+                          maxLength: state.textFieldMaxLength,
+                          minLines: state.textFieldMinLines,
+                          maxLines: state.textFieldMaxLines,
+                          validator: (commonName) =>
+                              !_submitted ? null : state.commonNameErrorText(commonName ?? ''),
+                          onEditingComplete: _focusNextInput,
+                        ),
+                        CustomTextFormField(
+                          key: CreateCatalogRecordScreen.scientificNameKey,
+                          controller: _scientificNameController,
+                          decoration: InputDecoration(
+                            labelText: state.scientificNameLabelText,
+                            hintText: state.scientificNameHintText,
+                            enabled: !state.isLoading,
+                          ),
+                          maxLength: state.textFieldMaxLength,
+                          minLines: state.textFieldMinLines,
+                          maxLines: state.textFieldMaxLines,
+                          validator: (scientificName) => !_submitted
+                              ? null
+                              : state.scientificNameErrorText(scientificName ?? ''),
+                          onEditingComplete: _focusNextInput,
+                        ),
+                        CustomTextFormField(
+                          key: CreateCatalogRecordScreen.descriptionKey,
+                          controller: _descriptionController,
+                          decoration: InputDecoration(
+                            labelText: state.descriptionLabelText,
+                            hintText: state.descriptionHintText,
+                            enabled: !state.isLoading,
+                          ),
+                          maxLength: state.textFieldMaxLength,
+                          minLines: state.textFieldMinLines,
+                          maxLines: state.textFieldMaxLines,
+                          validator: (commonName) =>
+                              !_submitted ? null : state.descriptionErrorText(commonName ?? ''),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
-                maxLength: state.textFieldMaxLength,
-                minLines: state.textFieldMinLines,
-                maxLines: state.textFieldMaxLines,
-                validator: (commonName) =>
-                    !_submitted ? null : state.commonNameErrorText(commonName ?? ''),
-                onEditingComplete: _focusNextInput,
-              ),
-              SimpleTextFormField(
-                key: CreateCatalogRecordScreen.scientificNameKey,
-                controller: _scientificNameController,
-                decoration: InputDecoration(
-                  hintText: state.scientificNameHintText,
-                  enabled: !state.isLoading,
+                gapH16,
+                InputListWidget(
+                  items: const [],
+                  decoration: InputDecoration(
+                    labelText: state.locationsLabelText,
+                    hintText: state.locationsHintText,
+                    enabled: !state.isLoading,
+                  ),
+                  onChange: _handleOnLocationListChanged,
                 ),
-                maxLength: state.textFieldMaxLength,
-                minLines: state.textFieldMinLines,
-                maxLines: state.textFieldMaxLines,
-                validator: (scientificName) =>
-                    !_submitted ? null : state.scientificNameErrorText(scientificName ?? ''),
-                onEditingComplete: _focusNextInput,
-              ),
-              SimpleTextFormField(
-                key: CreateCatalogRecordScreen.descriptionKey,
-                controller: _descriptionController,
-                decoration: InputDecoration(
-                  hintText: state.descriptionHintText,
-                  enabled: !state.isLoading,
+                gapH16,
+                Subtitle(text: state.sharePhotosText),
+                gapH4,
+                ImageSelectionWidget(
+                  images: const [],
+                  onImagesUpdated: _handleOnImagesUpdated,
                 ),
-                maxLength: state.textFieldMaxLength,
-                minLines: state.textFieldMinLines,
-                maxLines: state.textFieldMaxLines,
-                validator: (commonName) =>
-                    !_submitted ? null : state.descriptionErrorText(commonName ?? ''),
-              ),
-              InputListWidget(
-                items: const [],
-                label: 'Ingrese una ubicación donde encontrar a la especie'.hardcoded,
-                onChange: _handleOnLocationListChanged,
-              ),
-              Subtitle(text: state.sharePhotosText),
-              ImageSelectionWidget(
-                images: const [],
-                onImagesUpdated: _handleOnImagesUpdated,
-              ),
-              DoneButton(
-                isLoading: state.isLoading,
-                onPressed: state.isLoading
-                    ? null
-                    : () async {
-                        await _submit(state);
-                      },
-              ),
-            ],
+                gapH24,
+                DoneButton(
+                  isLoading: state.isLoading,
+                  onPressed: state.isLoading
+                      ? null
+                      : () async {
+                          await _submit(state);
+                        },
+                ),
+              ],
+            ),
           ),
         ),
       ),

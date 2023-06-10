@@ -1,9 +1,12 @@
+import 'package:flutter/material.dart';
+
 import '../../common/seed_edit_details.input.dart';
 
 class SowingWorkshopDetailsInput {
   final String title;
-  final DateTime startTime;
-  final DateTime endTime;
+  final DateTime date;
+  final TimeOfDay startTime;
+  final TimeOfDay endTime;
   final String description;
   final String meetupPoint;
   final List<String> organizers;
@@ -13,6 +16,7 @@ class SowingWorkshopDetailsInput {
 
   SowingWorkshopDetailsInput({
     required this.title,
+    required this.date,
     required this.startTime,
     required this.endTime,
     required this.description,

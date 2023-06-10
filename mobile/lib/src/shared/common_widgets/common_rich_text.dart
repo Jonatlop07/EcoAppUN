@@ -20,16 +20,16 @@ class CommonRichText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    TextStyle? bodyMediumStyle = Theme.of(context).textTheme.bodyMedium;
+    TextStyle? bodySmallStyle = Theme.of(context).textTheme.bodySmall;
     return RichText(
       text: TextSpan(
         children: children
             .map(
               (child) => TextSpan(
                 text: child.text,
-                style: bodyMediumStyle!.copyWith(
-                  fontStyle: child.fontStyle ?? bodyMediumStyle.fontStyle,
-                  fontWeight: child.fontWeight ?? bodyMediumStyle.fontWeight,
+                style: bodySmallStyle!.copyWith(
+                  fontStyle: child.fontStyle ?? bodySmallStyle.fontStyle,
+                  fontWeight: child.fontWeight ?? bodySmallStyle.fontWeight,
                 ),
               ),
             )

@@ -1,7 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
-import '../../../../shared/common_widgets/common_text.dart';
+import '../../../../shared/common_widgets/custom_text.dart';
 import '../../../../shared/common_widgets/common_rich_text.dart';
 import '../../../../shared/constants/app.sizes.dart';
 import '../../../../shared/time/datetime.format.dart';
@@ -47,7 +47,7 @@ class CatalogRecordImageWidget extends StatelessWidget {
           ],
         ),
         gapH4,
-        CommonText(
+        CustomText(
           text: image.description,
           textAlign: TextAlign.center,
         ),
