@@ -1,14 +1,18 @@
 import 'package:dio/dio.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mobile/src/features/ecotour/presentation/common/ecotour_details.dart';
+import 'package:mobile/src/features/ecotour/presentation/edit_ecotour/ecotour_edit_details.input.dart';
 
 import '../domain/ecotour.dart';
 
 class EcotourService {
-  final String _baseUrl = 'https://api.example.com'; // Reemplaza con la URL correcta de la API
+  static const String _baseUrl = 'http://localhost:8083';
   final Dio _dio = Dio();
 
-  Future<void> createEcotour(Ecotour ecotour) async {
+  Future<String> createEcotour(EcotourDetails ecotourDetails) async {
     try {
-      final response = await _dio.post('$_baseUrl/ecotours', data: ecotour.toJson());
+      final response = await _dio.post('$_baseUrl/ecotours', data: ecotourDetails.toJson());
+      return response.data['ecotour_id'];
     } catch (e) {
       throw Exception('Failed to create ecotour. Error: $e');
     }
@@ -32,9 +36,13 @@ class EcotourService {
     }
   }
 
-  Future<void> updateEcotour(Ecotour ecotour) async {
+  Future<String> updateEcotour(EcotourEditDetailsInput ecotourEditDetailsInput) async {
     try {
-      await _dio.patch('$_baseUrl/ecotours/${ecotour.id}', data: ecotour.toJson());
+      final response = await _dio.patch(
+        '$_baseUrl/ecotours/${ecotourEditDetailsInput.id}',
+        data: ecotourEditDetailsInput.toJson(),
+      );
+      return response.data['ecotour_id'];
     } catch (e) {
       throw Exception('Failed to update ecotour. Error: $e');
     }
@@ -64,3 +72,11 @@ class EcotourService {
     }
   }
 }
+
+final ecotourServiceProvider = Provider<EcotourService>((ref) {
+  return EcotourService();
+});
+
+final getAllEcotoursProvider = FutureProvider<List<Ecotour>>((ref) {
+  return ref.read(ecotourServiceProvider).getAllEcotours();
+});

@@ -63,7 +63,7 @@ func (repository *MongoDBEcorecoveryWorkshopRepository) GetAll() ([]EcorecoveryW
 func (repository *MongoDBEcorecoveryWorkshopRepository) Update(workshop EcorecoveryWorkshop) error {
 	workshopModel := FromEcorecoveryWorkshop(workshop)
 	workshopModel.UpdatedAt = time.Now()
-	_, err := repository.EcorecoveryWorkshopsCollection.UpdateOne(context.TODO(), bson.M{"_id": workshop.ID}, workshopModel)
+	_, err := repository.EcorecoveryWorkshopsCollection.UpdateOne(context.TODO(), bson.M{"_id": workshopModel.ID}, workshopModel)
 	if err != nil {
 		return err
 	}

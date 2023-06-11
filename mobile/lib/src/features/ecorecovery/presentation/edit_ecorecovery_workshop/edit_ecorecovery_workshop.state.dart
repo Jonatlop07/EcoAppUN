@@ -39,7 +39,7 @@ extension EditEcorecoveryWorkshopStateX on EditEcorecoveryWorkshopState {
   int get textFieldMaxLines => 3;
 
   String get formTitle {
-    return 'Nuevo taller de siembra'.hardcoded;
+    return 'Nuevoa jornada de restauración'.hardcoded;
   }
 
   String get generalDetailsSubtitle {
@@ -51,7 +51,7 @@ extension EditEcorecoveryWorkshopStateX on EditEcorecoveryWorkshopState {
   }
 
   String get titleHintText {
-    return 'Ingresa un título descriptivo del taller'.hardcoded;
+    return 'Ingresa un título descriptivo del evento'.hardcoded;
   }
 
   bool canSubmitTitle(String title) {
@@ -60,7 +60,7 @@ extension EditEcorecoveryWorkshopStateX on EditEcorecoveryWorkshopState {
 
   String? titleErrorText(String title) {
     final bool showErrorText = !canSubmitTitle(title);
-    final String errorText = 'Debes indicar el título del taller'.hardcoded;
+    final String errorText = 'Debes indicar el título del evento'.hardcoded;
     return showErrorText ? errorText : null;
   }
 
@@ -69,7 +69,7 @@ extension EditEcorecoveryWorkshopStateX on EditEcorecoveryWorkshopState {
   }
 
   String get descriptionHintText {
-    return 'Describe las características principales del taller'.hardcoded;
+    return 'Describe las características principales del evento'.hardcoded;
   }
 
   bool canSubmitDescription(String description) {
@@ -78,7 +78,7 @@ extension EditEcorecoveryWorkshopStateX on EditEcorecoveryWorkshopState {
 
   String? descriptionErrorText(String description) {
     final bool showErrorText = !canSubmitDescription(description);
-    final String errorText = 'Debes indicar la descripción del taller'.hardcoded;
+    final String errorText = 'Debes indicar la descripción del evento'.hardcoded;
     return showErrorText ? errorText : null;
   }
 
@@ -103,7 +103,7 @@ extension EditEcorecoveryWorkshopStateX on EditEcorecoveryWorkshopState {
   }
 
   String get instructionsLabelText {
-    return 'Instrucciones del taller'.hardcoded;
+    return 'Instrucciones del evento'.hardcoded;
   }
 
   String get instructionsHintText {
@@ -111,11 +111,11 @@ extension EditEcorecoveryWorkshopStateX on EditEcorecoveryWorkshopState {
   }
 
   String get objectivesLabelText {
-    return 'Objetivos del taller'.hardcoded;
+    return 'Objetivos del evento'.hardcoded;
   }
 
   String get objectivesHintText {
-    return 'Añade un objetivo del taller'.hardcoded;
+    return 'Añade un objetivo del evento'.hardcoded;
   }
 
   String get organizersLabelText {

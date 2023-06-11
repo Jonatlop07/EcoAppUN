@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile/src/features/catalog/presentation/edit_catalog_record/edit_catalog_record.screen.dart';
@@ -11,7 +12,12 @@ import '../../features/ecorecovery/domain/ecorecovery.dart';
 import '../../features/ecorecovery/presentation/create_ecorecovery_workshop/create_ecorecovery_workshop.screen.dart';
 import '../../features/ecorecovery/presentation/ecorecovery_workshops_feed/ecorecovery_workshops_feed.screen.dart';
 import '../../features/ecorecovery/presentation/edit_ecorecovery_workshop/edit_sowing_workshop.screen.dart';
-import '../../features/ecorecovery/presentation/query_sowing_workshop/ecorecovery_workshop.screen.dart';
+import '../../features/ecorecovery/presentation/query_ecorecovery_workshop/ecorecovery_workshop.screen.dart';
+import '../../features/ecotour/domain/ecotour.dart';
+import '../../features/ecotour/presentation/create_ecotour/create_ecotour.screen.dart';
+import '../../features/ecotour/presentation/ecotours_feed/ecotours_feed.screen.dart';
+import '../../features/ecotour/presentation/edit_ecotour/edit_sowing_workshop.screen.dart';
+import '../../features/ecotour/presentation/query_ecotour/ecotour.screen.dart';
 import '../../features/sowing/presentation/edit_sowing_workshop/edit_sowing_workshop.screen.dart';
 import '../../features/sowing/presentation/query_sowing_workshop/sowing_workshop.screen.dart';
 import '../../features/sowing/presentation/sowing_workshops_feed/sowing_workshops_feed.screen.dart';
@@ -25,6 +31,88 @@ final goRouterProvider = Provider<GoRouter>((ref) {
     debugLogDiagnostics: true,
     routes: [
       GoRoute(
+        path: '/',
+        name: Routes.ecotours,
+        pageBuilder: (context, state) => TransitionScreen.createFade(
+          context,
+          state,
+          EcotoursFeedScreen(
+            onEcotourSelected: (Ecotour ecotour) {
+              context.pushNamed(
+                Routes.queryEcotour,
+                pathParameters: {"ecotourId": ecotour.id},
+                extra: ecotour.toJson(),
+              );
+            },
+            onEditEcotour: (Ecotour ecotour) {
+              context.pushNamed(
+                Routes.editEcotour,
+                pathParameters: {"ecotourId": ecotour.id},
+                extra: ecotour.toJson(),
+              );
+            },
+            onDeleteEcotour: (String ecotourId) {
+              context.pushNamed(Routes.ecotours);
+            },
+            onCreateNewEcotour: () {
+              context.pushNamed(Routes.createEcotour);
+            },
+          ),
+        ),
+        routes: [
+          GoRoute(
+            path: 'create',
+            name: Routes.createEcotour,
+            pageBuilder: (context, state) => TransitionScreen.createFade(
+              context,
+              state,
+              const CreateEcotourScreen(),
+            ),
+          ),
+          GoRoute(
+            path: 'edit/:ecotourId',
+            name: Routes.editEcotour,
+            pageBuilder: (context, state) {
+              final data = state.extra as Map<String, dynamic>;
+              Ecotour ecotour = Ecotour.fromJson(data);
+              return TransitionScreen.createFade(
+                context,
+                state,
+                EditEcotourScreen(
+                  ecotour: ecotour,
+                ),
+              );
+            },
+          ),
+          GoRoute(
+            path: ':ecotourId',
+            name: Routes.queryEcotour,
+            pageBuilder: (context, state) {
+              final data = state.extra as Map<String, dynamic>;
+              debugPrint(data.toString());
+              Ecotour ecotour = Ecotour.fromJson(data);
+              return TransitionScreen.createFade(
+                context,
+                state,
+                EcotourScreen(
+                  ecotour: ecotour,
+                  onEditEcotour: (Ecotour ecotour) {
+                    context.pushNamed(
+                      Routes.editEcotour,
+                      pathParameters: {"ecotourId": ecotour.id},
+                      extra: ecotour.toJson(),
+                    );
+                  },
+                  onDeleteEcotour: (String ecotourId) {
+                    context.pushNamed(Routes.ecotours);
+                  },
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+      /*GoRoute(
         path: '/',
         name: Routes.ecorecoveryWorkshops,
         pageBuilder: (context, state) => TransitionScreen.createFade(
@@ -104,7 +192,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             },
           ),
         ],
-      ),
+      ),*/
       /*GoRoute(
         path: '/',
         name: Routes.sowingWorkshops,

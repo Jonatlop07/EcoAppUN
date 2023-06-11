@@ -2,8 +2,7 @@ package ecotour
 
 import "time"
 
-type Ecotour struct {
-	ID          string    `bson:"_id" json:"id"`
+type EcotourDetails struct {
 	AuthorID    string    `bson:"authorId" json:"author_id"`
 	Title       string    `bson:"title" json:"title"`
 	CreatedAt   time.Time `bson:"createdAt" json:"created_at"`
@@ -14,5 +13,4 @@ type Ecotour struct {
 	MeetupPoint string    `bson:"meetupPoint" json:"meetup_point"`
 	Description string    `bson:"description" json:"description"`
 	Organizers  []string  `bson:"organizers" json:"organizers"`
-	Attendees   []string  `bson:"attendees" json:"attendees"`
 }

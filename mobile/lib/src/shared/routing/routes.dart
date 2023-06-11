@@ -12,4 +12,8 @@ class Routes {
   static const queryEcorecoveryWorkshop = 'queryEcorecoveryWorkshop';
   static const createEcorecoveryWorkshop = 'createEcorecoveryWorkshop';
   static const editEcorecoveryWorkshop = 'editEcorecoveryWorkshop';
+  static const ecotours = 'ecotours';
+  static const queryEcotour = 'queryEcotour';
+  static const createEcotour = 'createEcotour';
+  static const editEcotour = 'editEcotour';
 }

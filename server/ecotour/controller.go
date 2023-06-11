@@ -13,20 +13,21 @@ type EcotourController struct {
 }
 
 func (controller *EcotourController) CreateEcotour(ctx *gin.Context) {
-	var ecotour Ecotour
-	if err := ctx.ShouldBindJSON(&ecotour); err != nil {
+	var ecotourDetails EcotourDetails
+	if err := ctx.ShouldBindJSON(&ecotourDetails); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 	validate := validator.New()
-	if err := validate.Struct(ecotour); err != nil {
+	if err := validate.Struct(ecotourDetails); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 	}
-	if err := controller.Gateway.Create(&ecotour); err != nil {
+	ecotourId, err := controller.Gateway.Create(ecotourDetails)
+	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	ctx.JSON(http.StatusCreated, ecotour)
+	ctx.JSON(http.StatusCreated, gin.H{"ecotour_id": ecotourId})
 }
 
 func (controller *EcotourController) GetEcotourByID(ctx *gin.Context) {
@@ -64,7 +65,7 @@ func (controller *EcotourController) UpdateEcotour(ctx *gin.Context) {
 	if err := validate.Struct(ecotour); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 	}
-	if err := controller.Gateway.Update(&ecotour); err != nil {
+	if err := controller.Gateway.Update(ecotour); err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}

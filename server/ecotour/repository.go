@@ -11,28 +11,27 @@ import (
 )
 
 type EcotourRepository interface {
-	Create(*Ecotour) error
-	GetByID(string) (*Ecotour, error)
-	GetAll() ([]*Ecotour, error)
-	Update(*Ecotour) error
-	Delete(string) error
-	AddAttendee(string, string) error
-	RemoveAttendee(string, string) error
+	Create(ecotourDetails EcotourDetails) (string, error)
+	GetByID(id string) (*Ecotour, error)
+	GetAll() ([]Ecotour, error)
+	Update(ecotour Ecotour) error
+	Delete(id string) error
+	AddAttendee(ecotourID string, attendeeID string) error
+	RemoveAttendee(ecotourID string, attendeeID string) error
 }
 
 type MongoDBEcotourRepository struct {
 	EcotoursCollection *mongo.Collection
 }
 
-func (repository *MongoDBEcotourRepository) Create(ecotour *Ecotour) error {
-	ecotour.ID = primitive.NewObjectID().Hex()
-	ecotour.CreatedAt = time.Now()
-	ecotour.UpdatedAt = time.Now()
-	_, err := repository.EcotoursCollection.InsertOne(context.TODO(), ecotour)
+func (repository *MongoDBEcotourRepository) Create(ecotourDetails EcotourDetails) (string, error) {
+	ecotour := FromDetails(ecotourDetails)
+	ecotourModel := FromEcotour(ecotour)
+	result, err := repository.EcotoursCollection.InsertOne(context.TODO(), ecotourModel)
 	if err != nil {
-		return err
+		return "", err
 	}
-	return nil
+	return result.InsertedID.(primitive.ObjectID).Hex(), nil
 }
 
 func (repository *MongoDBEcotourRepository) GetByID(id string) (*Ecotour, error) {
@@ -47,27 +46,26 @@ func (repository *MongoDBEcotourRepository) GetByID(id string) (*Ecotour, error)
 	return &ecotour, nil
 }
 
-func (repository *MongoDBEcotourRepository) GetAll() ([]*Ecotour, error) {
-	var ecotours []*Ecotour
+func (repository *MongoDBEcotourRepository) GetAll() ([]Ecotour, error) {
+	var ecotours []Ecotour
 	cur, err := repository.EcotoursCollection.Find(context.TODO(), bson.M{})
 	if err != nil {
 		return nil, err
 	}
 	defer cur.Close(context.TODO())
-	for cur.Next(context.TODO()) {
-		var ecotour Ecotour
-		err := cur.Decode(&ecotour)
-		if err != nil {
-			return nil, err
-		}
-		ecotours = append(ecotours, &ecotour)
+	if err = cur.All(context.TODO(), &ecotours); err != nil {
+		return nil, err
+	}
+	if ecotours == nil {
+		ecotours = []Ecotour{}
 	}
 	return ecotours, nil
 }
 
-func (repository *MongoDBEcotourRepository) Update(ecotour *Ecotour) error {
-	ecotour.UpdatedAt = time.Now()
-	_, err := repository.EcotoursCollection.ReplaceOne(context.TODO(), bson.M{"_id": ecotour.ID}, ecotour)
+func (repository *MongoDBEcotourRepository) Update(ecotour Ecotour) error {
+	ecotourModel := FromEcotour(ecotour)
+	ecotourModel.UpdatedAt = time.Now()
+	_, err := repository.EcotoursCollection.ReplaceOne(context.TODO(), bson.M{"_id": ecotourModel.ID}, ecotour)
 	if err != nil {
 		return err
 	}
