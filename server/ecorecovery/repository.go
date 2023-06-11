@@ -11,29 +11,28 @@ import (
 )
 
 type EcorecoveryWorkshopRepository interface {
-	Create(workshop *EcorecoveryWorkshop) error
+	Create(workshopDetails EcorecoveryWorkshopDetails) (string, error)
 	GetByID(id string) (*EcorecoveryWorkshop, error)
-	GetAll() ([]*EcorecoveryWorkshop, error)
-	Update(workshop *EcorecoveryWorkshop) error
+	GetAll() ([]EcorecoveryWorkshop, error)
+	Update(workshop EcorecoveryWorkshop) error
 	Delete(id string) error
 	AddAttendee(workshopID string, attendeeID string) error
 	RemoveAttendee(workshopID string, attendeeID string) error
-	UpdateObjectives(workshopID string, objectives []*Objective) ([]Objective, error)
+	UpdateObjectives(workshopID string, objectives []Objective) ([]Objective, error)
 }
 
 type MongoDBEcorecoveryWorkshopRepository struct {
 	EcorecoveryWorkshopsCollection *mongo.Collection
 }
 
-func (repository *MongoDBEcorecoveryWorkshopRepository) Create(workshop *EcorecoveryWorkshop) error {
-	workshop.ID = primitive.NewObjectID().Hex()
-	workshop.CreatedAt = time.Now()
-	workshop.UpdatedAt = time.Now()
-	_, err := repository.EcorecoveryWorkshopsCollection.InsertOne(context.TODO(), workshop)
+func (repository *MongoDBEcorecoveryWorkshopRepository) Create(workshopDetails EcorecoveryWorkshopDetails) (string, error) {
+	workshop := FromDetails(workshopDetails)
+	workshopModel := FromEcorecoveryWorkshop(workshop)
+	result, err := repository.EcorecoveryWorkshopsCollection.InsertOne(context.TODO(), workshopModel)
 	if err != nil {
-		return err
+		return "", err
 	}
-	return nil
+	return result.InsertedID.(primitive.ObjectID).Hex(), nil
 }
 
 func (repository *MongoDBEcorecoveryWorkshopRepository) GetByID(id string) (*EcorecoveryWorkshop, error) {
@@ -45,29 +44,26 @@ func (repository *MongoDBEcorecoveryWorkshopRepository) GetByID(id string) (*Eco
 	return &workshop, nil
 }
 
-func (repository *MongoDBEcorecoveryWorkshopRepository) GetAll() ([]*EcorecoveryWorkshop, error) {
-	var workshops []*EcorecoveryWorkshop
+func (repository *MongoDBEcorecoveryWorkshopRepository) GetAll() ([]EcorecoveryWorkshop, error) {
+	var workshops []EcorecoveryWorkshop
 	cur, err := repository.EcorecoveryWorkshopsCollection.Find(context.TODO(), bson.M{})
 	if err != nil {
 		return nil, err
 	}
 	defer cur.Close(context.TODO())
-	for cur.Next(context.TODO()) {
-		var workshop EcorecoveryWorkshop
-		if err := cur.Decode(&workshop); err != nil {
-			return nil, err
-		}
-		workshops = append(workshops, &workshop)
-	}
-	if err := cur.Err(); err != nil {
+	if err = cur.All(context.TODO(), &workshops); err != nil {
 		return nil, err
+	}
+	if workshops == nil {
+		workshops = []EcorecoveryWorkshop{}
 	}
 	return workshops, nil
 }
 
-func (repository *MongoDBEcorecoveryWorkshopRepository) Update(workshop *EcorecoveryWorkshop) error {
-	workshop.UpdatedAt = time.Now()
-	_, err := repository.EcorecoveryWorkshopsCollection.UpdateOne(context.TODO(), workshop.ID, workshop)
+func (repository *MongoDBEcorecoveryWorkshopRepository) Update(workshop EcorecoveryWorkshop) error {
+	workshopModel := FromEcorecoveryWorkshop(workshop)
+	workshopModel.UpdatedAt = time.Now()
+	_, err := repository.EcorecoveryWorkshopsCollection.UpdateOne(context.TODO(), bson.M{"_id": workshop.ID}, workshopModel)
 	if err != nil {
 		return err
 	}
@@ -115,7 +111,7 @@ func (repository *MongoDBEcorecoveryWorkshopRepository) RemoveAttendee(workshopI
 	return nil
 }
 
-func (repository *MongoDBEcorecoveryWorkshopRepository) UpdateObjectives(recoveryWorkshopID string, objectives []*Objective) ([]Objective, error) {
+func (repository *MongoDBEcorecoveryWorkshopRepository) UpdateObjectives(recoveryWorkshopID string, objectives []Objective) ([]Objective, error) {
 	filter := bson.M{"_id": recoveryWorkshopID}
 	update := bson.M{"$set": bson.M{"objectives": objectives}}
 	opts := options.FindOneAndUpdate().SetReturnDocument(options.After)

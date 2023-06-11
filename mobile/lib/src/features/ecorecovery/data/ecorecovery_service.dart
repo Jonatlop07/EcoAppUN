@@ -1,13 +1,20 @@
 import 'package:dio/dio.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mobile/src/features/ecorecovery/presentation/common/ecorecovery_workshop_details.dart';
+import 'package:mobile/src/features/ecorecovery/presentation/edit_ecorecovery_workshop/ecorecovery_workshop_edit_details.input.dart';
 import '../domain/ecorecovery.dart';
 
-class ErecoveryService {
-  static const String baseUrl = 'https://api.example.com'; // Reemplaza con la URL de tu backend
+class EcorecoveryService {
+  static const String baseUrl = 'http://localhost:8083';
   final Dio dio = Dio();
 
-  Future<void> createWorkshop(Map<String, dynamic> workshop) async {
+  Future<String> createWorkshop(EcorecoveryWorkshopDetails workshopDetails) async {
     try {
-      final response = await dio.post('$baseUrl/ecorecovery-workshops', data: workshop);
+      final response = await dio.post(
+        '$baseUrl/ecorecovery-workshops',
+        data: workshopDetails.toJson(),
+      );
+      return response.data['ecorecovery_workshop_id'];
     } catch (error) {
       throw Exception('Failed to create workshop: $error');
     }
@@ -33,9 +40,13 @@ class ErecoveryService {
     }
   }
 
-  Future<void> updateWorkshop(String id, Map<String, dynamic> workshop) async {
+  Future<String> updateWorkshop(EcorecoveryWorkshopEditDetailsInput ecorecoveryWorkshop) async {
     try {
-      final response = await dio.patch('$baseUrl/ecorecovery-workshops/$id', data: workshop);
+      final response = await dio.patch(
+        '$baseUrl/ecorecovery-workshops/${ecorecoveryWorkshop.id}',
+        data: ecorecoveryWorkshop.toJson(),
+      );
+      return response.data['ecorecovery_workshop_id'];
     } catch (error) {
       throw Exception('Failed to update workshop: $error');
     }
@@ -78,3 +89,11 @@ class ErecoveryService {
     }
   }
 }
+
+final ecorecoveryServiceProvider = Provider<EcorecoveryService>((ref) {
+  return EcorecoveryService();
+});
+
+final getAllEcorecoveryWorkshopsProvider = FutureProvider<List<EcorecoveryWorkshop>>((ref) {
+  return ref.read(ecorecoveryServiceProvider).getAllWorkshops();
+});

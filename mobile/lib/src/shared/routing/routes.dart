@@ -8,4 +8,8 @@ class Routes {
   static const querySowingWorkshop = 'querySowingWorkshop';
   static const createSowingWorkshop = 'createSowingWorkshop';
   static const editSowingWorkshop = 'editSowingWorkshop';
+  static const ecorecoveryWorkshops = 'ecorecoveryWorkshops';
+  static const queryEcorecoveryWorkshop = 'queryEcorecoveryWorkshop';
+  static const createEcorecoveryWorkshop = 'createEcorecoveryWorkshop';
+  static const editEcorecoveryWorkshop = 'editEcorecoveryWorkshop';
 }

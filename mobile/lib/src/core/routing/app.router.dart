@@ -7,6 +7,11 @@ import '../../features/catalog/domain/catalog.dart';
 import '../../features/catalog/presentation/catalog_query/catalog.screen.dart';
 import '../../features/catalog/presentation/catalog_record_query/catalog_record.screen.dart';
 import '../../features/catalog/presentation/create_catalog_record/create_catalog_record.screen.dart';
+import '../../features/ecorecovery/domain/ecorecovery.dart';
+import '../../features/ecorecovery/presentation/create_ecorecovery_workshop/create_ecorecovery_workshop.screen.dart';
+import '../../features/ecorecovery/presentation/ecorecovery_workshops_feed/ecorecovery_workshops_feed.screen.dart';
+import '../../features/ecorecovery/presentation/edit_ecorecovery_workshop/edit_sowing_workshop.screen.dart';
+import '../../features/ecorecovery/presentation/query_sowing_workshop/ecorecovery_workshop.screen.dart';
 import '../../features/sowing/presentation/edit_sowing_workshop/edit_sowing_workshop.screen.dart';
 import '../../features/sowing/presentation/query_sowing_workshop/sowing_workshop.screen.dart';
 import '../../features/sowing/presentation/sowing_workshops_feed/sowing_workshops_feed.screen.dart';
@@ -20,6 +25,87 @@ final goRouterProvider = Provider<GoRouter>((ref) {
     debugLogDiagnostics: true,
     routes: [
       GoRoute(
+        path: '/',
+        name: Routes.ecorecoveryWorkshops,
+        pageBuilder: (context, state) => TransitionScreen.createFade(
+          context,
+          state,
+          EcorecoveryWorkshopsFeedScreen(
+            onEcorecoveryWorkshopSelected: (EcorecoveryWorkshop ecorecoveryWorkshop) {
+              context.pushNamed(
+                Routes.queryEcorecoveryWorkshop,
+                pathParameters: {"ecorecoveryWorkshopId": ecorecoveryWorkshop.id},
+                extra: ecorecoveryWorkshop.toJson(),
+              );
+            },
+            onEditEcorecoveryWorkshop: (EcorecoveryWorkshop ecorecoveryWorkshop) {
+              context.pushNamed(
+                Routes.editEcorecoveryWorkshop,
+                pathParameters: {"ecorecoveryWorkshopId": ecorecoveryWorkshop.id},
+                extra: ecorecoveryWorkshop.toJson(),
+              );
+            },
+            onDeleteEcorecoveryWorkshop: (String ecorecoveryWorkshopId) {
+              context.pushNamed(Routes.ecorecoveryWorkshops);
+            },
+            onCreateNewEcorecoveryWorkshop: () {
+              context.pushNamed(Routes.createEcorecoveryWorkshop);
+            },
+          ),
+        ),
+        routes: [
+          GoRoute(
+            path: 'create',
+            name: Routes.createEcorecoveryWorkshop,
+            pageBuilder: (context, state) => TransitionScreen.createFade(
+              context,
+              state,
+              const CreateEcorecoveryWorkshopScreen(),
+            ),
+          ),
+          GoRoute(
+            path: 'edit/:ecorecoveryWorkshopId',
+            name: Routes.editEcorecoveryWorkshop,
+            pageBuilder: (context, state) {
+              final data = state.extra as Map<String, dynamic>;
+              EcorecoveryWorkshop ecorecoveryWorkshop = EcorecoveryWorkshop.fromJson(data);
+              return TransitionScreen.createFade(
+                context,
+                state,
+                EditEcorecoveryWorkshopScreen(
+                  ecorecoveryWorkshop: ecorecoveryWorkshop,
+                ),
+              );
+            },
+          ),
+          GoRoute(
+            path: ':ecorecoveryWorkshopId',
+            name: Routes.queryEcorecoveryWorkshop,
+            pageBuilder: (context, state) {
+              final data = state.extra as Map<String, dynamic>;
+              EcorecoveryWorkshop ecorecoveryWorkshop = EcorecoveryWorkshop.fromJson(data);
+              return TransitionScreen.createFade(
+                context,
+                state,
+                EcorecoveryWorkshopScreen(
+                  ecorecoveryWorkshop: ecorecoveryWorkshop,
+                  onEditEcorecoveryWorkshop: (EcorecoveryWorkshop ecorecoveryWorkshop) {
+                    context.pushNamed(
+                      Routes.editEcorecoveryWorkshop,
+                      pathParameters: {"ecorecoveryWorkshopId": ecorecoveryWorkshop.id},
+                      extra: ecorecoveryWorkshop.toJson(),
+                    );
+                  },
+                  onDeleteEcorecoveryWorkshop: (String ecorecoveryWorkshopId) {
+                    context.pushNamed(Routes.ecorecoveryWorkshops);
+                  },
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+      /*GoRoute(
         path: '/',
         name: Routes.sowingWorkshops,
         pageBuilder: (context, state) => TransitionScreen.createFade(
@@ -99,7 +185,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             },
           ),
         ],
-      ),
+      ),*/
       /*GoRoute(
         path: '/',
         name: Routes.catalog,

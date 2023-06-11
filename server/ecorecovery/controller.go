@@ -13,20 +13,21 @@ type EcorecoveryWorkshopController struct {
 }
 
 func (controller *EcorecoveryWorkshopController) CreateWorkshop(ctx *gin.Context) {
-	var workshop EcorecoveryWorkshop
-	if err := ctx.ShouldBindJSON(&workshop); err != nil {
+	var workshopDetails EcorecoveryWorkshopDetails
+	if err := ctx.ShouldBindJSON(&workshopDetails); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 	validate := validator.New()
-	if err := validate.Struct(workshop); err != nil {
+	if err := validate.Struct(workshopDetails); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 	}
-	if err := controller.Gateway.Create(&workshop); err != nil {
+	workshopID, err := controller.Gateway.Create(workshopDetails)
+	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	ctx.JSON(http.StatusCreated, workshop)
+	ctx.JSON(http.StatusCreated, gin.H{"ecorecovery_workshop_id": workshopID})
 }
 
 func (controller *EcorecoveryWorkshopController) GetWorkshopByID(ctx *gin.Context) {
@@ -64,7 +65,7 @@ func (controller *EcorecoveryWorkshopController) UpdateWorkshop(ctx *gin.Context
 	if err := validate.Struct(workshop); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 	}
-	if err := controller.Gateway.Update(&workshop); err != nil {
+	if err := controller.Gateway.Update(workshop); err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -102,7 +103,7 @@ func (controller *EcorecoveryWorkshopController) RemoveAttendee(ctx *gin.Context
 
 func (controller *EcorecoveryWorkshopController) UpdateObjectives(ctx *gin.Context) {
 	workshopID := ctx.Param("id")
-	var objectives []*Objective
+	var objectives []Objective
 	if err := ctx.ShouldBindJSON(&objectives); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
