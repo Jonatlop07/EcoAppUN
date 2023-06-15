@@ -3,21 +3,21 @@ package sowing
 import "time"
 
 type SowingWorkshopDetails struct {
-	AuthorID     string        `bson:"authorId" json:"author_id"`
-	Title        string        `bson:"title" json:"title"`
-	Date         time.Time     `bson:"date" json:"date"`
-	StartTime    time.Time     `bson:"startTime" json:"start_time"`
-	EndTime      time.Time     `bson:"endTime" json:"end_time"`
-	Description  string        `bson:"description" json:"description"`
-	MeetupPoint  string        `bson:"meetupPoint" json:"meetup_point"`
-	Organizers   []string      `bson:"organizers" json:"organizers"`
-	Instructions []string      `bson:"instructions" json:"instructions"`
-	Seeds        []SeedDetails `bson:"seeds" json:"seeds"`
-	Objectives   []string      `bson:"objectives" json:"objectives"`
+	AuthorID     string        `json:"author_id" validate:"required"`
+	Title        string        `json:"title" validate:"required"`
+	Date         time.Time     `json:"date" validate:"required"`
+	StartTime    time.Time     `json:"start_time" validate:"required"`
+	EndTime      time.Time     `json:"end_time" validate:"required"`
+	Description  string        `json:"description" validate:"required"`
+	MeetupPoint  string        `json:"meetup_point" validate:"required"`
+	Organizers   []string      `json:"organizers" validate:"required"`
+	Instructions []string      `json:"instructions" validate:"required"`
+	Seeds        []SeedDetails `json:"seeds" validate:"required"`
+	Objectives   []string      `json:"objectives" validate:"required"`
 }
 
 type SeedDetails struct {
-	Description     string `bson:"description" json:"description"`
-	ImageLink       string `bson:"imageLink" json:"image_link"`
-	AvailableAmount int    `bson:"availableAmount" json:"available_amount"`
+	Description     string `json:"description" validate:"required"`
+	ImageLink       string `json:"image_link" validate:"required"`
+	AvailableAmount int    `json:"available_amount" validate:"required"`
 }

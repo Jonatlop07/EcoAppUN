@@ -16,4 +16,8 @@ class Routes {
   static const queryEcotour = 'queryEcotour';
   static const createEcotour = 'createEcotour';
   static const editEcotour = 'editEcotour';
+  static const denouncements = 'denouncements';
+  static const queryDenouncement = 'queryDenouncement';
+  static const createDenouncement = 'createDenouncement';
+  static const editDenouncement = 'editDenouncement';
 }

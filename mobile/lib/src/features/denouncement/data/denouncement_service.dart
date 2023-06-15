@@ -1,4 +1,7 @@
 import 'package:dio/dio.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mobile/src/features/denouncement/data/denouncement_details.dart';
+import 'package:mobile/src/features/denouncement/presentation/edit_catalog_record/denouncement_edit_details.input.dart';
 import '../domain/denouncement.dart';
 
 class DenouncementService {
@@ -25,19 +28,22 @@ class DenouncementService {
     }
   }
 
-  Future<Denouncement> createDenouncement(Denouncement denouncement) async {
+  Future<String> createDenouncement(DenouncementDetails denouncement) async {
     try {
       final response = await _dio.post('$baseUrl/denouncements', data: denouncement.toJson());
-      return Denouncement.fromJson(response.data);
+      return response.data['denouncement_id'];
     } catch (e) {
       throw Exception('Failed to create denouncement. Error: $e');
     }
   }
 
-  Future<Denouncement> updateDenouncement(String id, Denouncement denouncement) async {
+  Future<String> updateDenouncement(DenouncementEditDetailsInput denouncement) async {
     try {
-      final response = await _dio.put('$baseUrl/denouncements/$id', data: denouncement.toJson());
-      return Denouncement.fromJson(response.data);
+      final response = await _dio.put(
+        '$baseUrl/denouncements/${denouncement.id}',
+        data: denouncement.toJson(),
+      );
+      return response.data['denouncement_record_id'].toString();
     } catch (e) {
       throw Exception('Failed to update denouncement. Error: $e');
     }
@@ -140,3 +146,11 @@ class DenouncementService {
     }
   }
 }
+
+final denouncementServiceProvider = Provider<DenouncementService>((ref) {
+  return DenouncementService();
+});
+
+final getAllDenouncementsProvider = FutureProvider<List<Denouncement>>((ref) {
+  return ref.read(denouncementServiceProvider).getDenouncements();
+});

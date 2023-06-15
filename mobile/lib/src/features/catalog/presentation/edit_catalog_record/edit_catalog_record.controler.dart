@@ -39,7 +39,7 @@ class EditCatalogRecordController extends StateNotifier<EditCatalogRecordState> 
           .map(
             (imageInput) => ImageEditDetailsInput(
               id: imageInput.id,
-              authorId: imageInput.id ?? _currentUser!.id,
+              authorId: imageInput.authorId ?? _currentUser!.id,
               authorName: imageInput.authorName ?? _currentUser!.username,
               description: imageInput.description,
               url: imageInput.url,

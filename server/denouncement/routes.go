@@ -15,8 +15,8 @@ func SetupDenouncementRoutes(router *gin.Engine, denouncementController *Denounc
 		denouncementGroup.PATCH("/:id/comments/:comment_id/responses", denouncementController.CreateCommentResponse)
 		denouncementGroup.DELETE("/:id/comments/:comment_id/responses/:response_id", denouncementController.DeleteCommentResponse)
 		denouncementGroup.PATCH("/:id/comments/:comment_id/reactions", denouncementController.CreateCommentReaction)
-		denouncementGroup.DELETE("/:id/comments/:comment_id/reactions/:user_id", denouncementController.DeleteCommentReaction)
+		denouncementGroup.DELETE("/:id/comments/:comment_id/reactions/:author_id", denouncementController.DeleteCommentReaction)
 		denouncementGroup.PATCH("/:id/comments/:comment_id/responses/:response_id/reactions/", denouncementController.CreateCommentResponseReaction)
-		denouncementGroup.DELETE("/:id/comments/:comment_id/responses/:response_id/reactions/:user_id", denouncementController.DeleteCommentResponseReaction)
+		denouncementGroup.DELETE("/:id/comments/:comment_id/responses/:response_id/reactions/:author_id", denouncementController.DeleteCommentResponseReaction)
 	}
 }

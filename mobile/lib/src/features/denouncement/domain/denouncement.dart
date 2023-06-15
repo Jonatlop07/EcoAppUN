@@ -7,7 +7,7 @@ class Denouncement {
   final DateTime initialDate;
   final DateTime finalDate;
   final String description;
-  final List<String> mediaLinks;
+  final List<DenouncementMultimedia> multimediaElements;
   final List<Comment> comments;
 
   Denouncement({
@@ -19,7 +19,7 @@ class Denouncement {
     required this.initialDate,
     required this.finalDate,
     required this.description,
-    required this.mediaLinks,
+    required this.multimediaElements,
     required this.comments,
   });
 
@@ -33,7 +33,11 @@ class Denouncement {
       initialDate: DateTime.parse(json['initial_date']),
       finalDate: DateTime.parse(json['final_date']),
       description: json['description'],
-      mediaLinks: List<String>.from(json['media_links']),
+      multimediaElements: List<DenouncementMultimedia>.from(
+        json['multimedia_elements'].map(
+          (multimediaElement) => DenouncementMultimedia.fromJson(multimediaElement),
+        ),
+      ),
       comments: List<Comment>.from(json['comments'].map((comment) => Comment.fromJson(comment))),
     );
   }
@@ -48,7 +52,7 @@ class Denouncement {
       'initial_date': initialDate.toIso8601String(),
       'final_date': finalDate.toIso8601String(),
       'description': description,
-      'media_links': mediaLinks,
+      'multimedia_elements': multimediaElements,
       'comments': comments.map((comment) => comment.toJson()).toList(),
     };
   }
@@ -95,6 +99,34 @@ class Comment {
       'created_at': createdAt.toIso8601String(),
       'reactions': reactions.map((reaction) => reaction.toJson()).toList(),
       'responses': responses.map((response) => response.toJson()).toList(),
+    };
+  }
+}
+
+class DenouncementMultimedia {
+  final String description;
+  final DateTime submittedAt;
+  final String uri;
+
+  DenouncementMultimedia({
+    required this.description,
+    required this.submittedAt,
+    required this.uri,
+  });
+
+  factory DenouncementMultimedia.fromJson(Map<String, dynamic> json) {
+    return DenouncementMultimedia(
+      description: json['description'],
+      submittedAt: DateTime.parse(json['submitted_at']),
+      uri: json['uri'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'description': description,
+      'submitted_at': submittedAt.toIso8601String(),
+      'uri': uri,
     };
   }
 }

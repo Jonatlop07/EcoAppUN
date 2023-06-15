@@ -12,21 +12,22 @@ type DenouncementController struct {
 	Gateway DenouncementRepository
 }
 
-func (denouncementController *DenouncementController) CreateDenouncement(ctx *gin.Context) {
-	var denouncement Denouncement
-	if err := ctx.ShouldBindJSON(&denouncement); err != nil {
+func (controller *DenouncementController) CreateDenouncement(ctx *gin.Context) {
+	var denouncementDetails DenouncementDetails
+	if err := ctx.ShouldBindJSON(&denouncementDetails); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 	validate := validator.New()
-	if err := validate.Struct(denouncement); err != nil {
+	if err := validate.Struct(denouncementDetails); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 	}
-	if err := denouncementController.Gateway.Create(&denouncement); err != nil {
+	denouncementID, err := controller.Gateway.Create(denouncementDetails)
+	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	ctx.JSON(http.StatusCreated, denouncement)
+	ctx.JSON(http.StatusCreated, gin.H{"denouncement_id": denouncementID})
 }
 
 func (denouncementController *DenouncementController) UpdateDenouncement(ctx *gin.Context) {
@@ -36,16 +37,15 @@ func (denouncementController *DenouncementController) UpdateDenouncement(ctx *gi
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	denouncement.ID = denouncementID
 	validate := validator.New()
 	if err := validate.Struct(denouncement); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 	}
-	if err := denouncementController.Gateway.Update(&denouncement); err != nil {
+	if err := denouncementController.Gateway.Update(denouncement); err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	ctx.JSON(http.StatusOK, denouncement)
+	ctx.JSON(http.StatusOK, gin.H{"denouncement_id": denouncementID})
 }
 
 func (denouncementController *DenouncementController) DeleteDenouncement(ctx *gin.Context) {
@@ -68,7 +68,7 @@ func (denouncementController *DenouncementController) GetDenouncementByID(ctx *g
 		}
 		return
 	}
-	ctx.JSON(http.StatusOK, denouncement)
+	ctx.JSON(http.StatusOK, gin.H{"denouncement": denouncement})
 }
 
 func (denouncementController *DenouncementController) GetAllDenouncements(ctx *gin.Context) {
@@ -77,32 +77,31 @@ func (denouncementController *DenouncementController) GetAllDenouncements(ctx *g
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	ctx.JSON(http.StatusOK, denouncements)
+	ctx.JSON(http.StatusOK, gin.H{"denouncements": denouncements})
 }
 
 func (denouncementController *DenouncementController) CreateComment(ctx *gin.Context) {
 	denouncementID := ctx.Param("id")
-	var comment Comment
-	if err := ctx.ShouldBindJSON(&comment); err != nil {
+	var commentDetails CommentDetails
+	if err := ctx.ShouldBindJSON(&commentDetails); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	comment.DenouncementID = denouncementID
-	if err := denouncementController.Gateway.CreateComment(&comment); err != nil {
+	createdComment, err := denouncementController.Gateway.CreateComment(denouncementID, commentDetails)
+	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	ctx.JSON(http.StatusOK, comment)
+	ctx.JSON(http.StatusOK, gin.H{"comment": createdComment})
 }
 
 func (denouncementController *DenouncementController) DeleteComment(ctx *gin.Context) {
 	denouncementID := ctx.Param("id")
 	commentID := ctx.Param("comment_id")
-	comment := &Comment{
-		ID:             commentID,
-		DenouncementID: denouncementID,
-	}
-	if err := denouncementController.Gateway.DeleteComment(comment); err != nil {
+	err := denouncementController.Gateway.DeleteComment(
+		CommentIdentifiersDTO{DenouncementID: denouncementID, CommentID: commentID},
+	)
+	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -112,63 +111,75 @@ func (denouncementController *DenouncementController) DeleteComment(ctx *gin.Con
 func (denouncementController *DenouncementController) CreateCommentResponse(ctx *gin.Context) {
 	denouncementID := ctx.Param("id")
 	commentID := ctx.Param("comment_id")
-	var response Response
-	if err := ctx.ShouldBindJSON(&response); err != nil {
+	var responseDetails ResponseDetails
+	if err := ctx.ShouldBindJSON(&responseDetails); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	response.DenouncementID = denouncementID
-	response.CommentID = commentID
-	if err := denouncementController.Gateway.CreateResponse(&response); err != nil {
+	createdResponse, err := denouncementController.Gateway.CreateResponse(
+		CommentIdentifiersDTO{
+			DenouncementID: denouncementID,
+			CommentID:      commentID,
+		},
+		responseDetails,
+	)
+	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	ctx.JSON(http.StatusOK, response)
+	ctx.JSON(http.StatusOK, gin.H{"comment_response": createdResponse})
 }
 
 func (denouncementController *DenouncementController) DeleteCommentResponse(ctx *gin.Context) {
 	denouncementID := ctx.Param("id")
 	commentID := ctx.Param("comment_id")
 	responseID := ctx.Param("response_id")
-	response := &Response{
-		ID:             responseID,
-		DenouncementID: denouncementID,
-		CommentID:      commentID,
-	}
-	if err := denouncementController.Gateway.DeleteResponse(response); err != nil {
+	if err := denouncementController.Gateway.DeleteResponse(
+		ResponseIdentifiersDTO{
+			DenouncementID: denouncementID,
+			CommentID:      commentID,
+			ResponseID:     responseID,
+		},
+	); err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	ctx.JSON(http.StatusOK, gin.H{"message": "Response deleted successfully"})
+	ctx.JSON(http.StatusOK, gin.H{"message": "Comment response deleted successfully"})
 }
 
 func (denouncementController *DenouncementController) CreateCommentReaction(ctx *gin.Context) {
 	denouncementID := ctx.Param("id")
 	commentID := ctx.Param("comment_id")
-	var reaction CommentReaction
-	if err := ctx.ShouldBindJSON(&reaction); err != nil {
+	var reactionDetails CommentReactionDetails
+	if err := ctx.ShouldBindJSON(&reactionDetails); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	reaction.DenouncementID = denouncementID
-	reaction.CommentID = commentID
-	if err := denouncementController.Gateway.CreateCommentReaction(&reaction); err != nil {
+	createdReaction, err := denouncementController.Gateway.CreateCommentReaction(
+		CommentIdentifiersDTO{
+			DenouncementID: denouncementID,
+			CommentID:      commentID,
+		},
+		reactionDetails,
+	)
+	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	ctx.JSON(http.StatusOK, reaction)
+	ctx.JSON(http.StatusOK, gin.H{"comment_reaction": createdReaction})
 }
 
 func (denouncementController *DenouncementController) DeleteCommentReaction(ctx *gin.Context) {
 	denouncementID := ctx.Param("id")
 	commentID := ctx.Param("comment_id")
-	reactionID := ctx.Param("reaction_id")
-	reaction := &CommentReaction{
-		ID:             reactionID,
-		DenouncementID: denouncementID,
-		CommentID:      commentID,
-	}
-	if err := denouncementController.Gateway.DeleteCommentReaction(reaction); err != nil {
+	authorID := ctx.Param("author_id")
+	if err := denouncementController.Gateway.DeleteCommentReaction(
+		CommentReactionIdentifiersDTO{
+			DenouncementID: denouncementID,
+			CommentID:      commentID,
+			AuthorID:       authorID,
+		},
+	); err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -179,33 +190,39 @@ func (denouncementController *DenouncementController) CreateCommentResponseReact
 	denouncementID := ctx.Param("id")
 	commentID := ctx.Param("comment_id")
 	responseID := ctx.Param("response_id")
-	var reaction ResponseReaction
-	if err := ctx.ShouldBindJSON(&reaction); err != nil {
+	var reactionDetails ResponseReactionDetails
+	if err := ctx.ShouldBindJSON(&reactionDetails); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	reaction.DenouncementID = denouncementID
-	reaction.CommentID = commentID
-	reaction.ResponseID = responseID
-	if err := denouncementController.Gateway.CreateResponseReaction(&reaction); err != nil {
+	createdReaction, err := denouncementController.Gateway.CreateResponseReaction(
+		ResponseIdentifiersDTO{
+			DenouncementID: denouncementID,
+			CommentID:      commentID,
+			ResponseID:     responseID,
+		},
+		reactionDetails,
+	)
+	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	ctx.JSON(http.StatusOK, reaction)
+	ctx.JSON(http.StatusOK, gin.H{"response_reaction": createdReaction})
 }
 
 func (denouncementController *DenouncementController) DeleteCommentResponseReaction(ctx *gin.Context) {
 	denouncementID := ctx.Param("id")
 	commentID := ctx.Param("comment_id")
 	responseID := ctx.Param("response_id")
-	userID := ctx.Param("user_id")
-	reaction := &ResponseReaction{
-		UserID:         userID,
-		DenouncementID: denouncementID,
-		CommentID:      commentID,
-		ResponseID:     responseID,
-	}
-	if err := denouncementController.Gateway.DeleteResponseReaction(reaction); err != nil {
+	authorID := ctx.Param("author_id")
+	if err := denouncementController.Gateway.DeleteResponseReaction(
+		ResponseReactionIdentifiersDTO{
+			DenouncementID: denouncementID,
+			CommentID:      commentID,
+			ResponseID:     responseID,
+			AuthorID:       authorID,
+		},
+	); err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}

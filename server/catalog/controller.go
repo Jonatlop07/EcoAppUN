@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type CatalogController struct {
@@ -27,14 +28,18 @@ func (controller *CatalogController) CreateCatalogRecord(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	ctx.JSON(http.StatusCreated, gin.H{"record_id": catalogRecordID})
+	ctx.JSON(http.StatusCreated, gin.H{"catalog_record_id": catalogRecordID})
 }
 
 func (controller *CatalogController) GetCatalogRecordByID(ctx *gin.Context) {
 	id := ctx.Param("id")
 	catalogRecord, err := controller.Gateway.GetByID(id)
 	if err != nil {
-		ctx.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		if err == mongo.ErrNoDocuments {
+			ctx.JSON(http.StatusNotFound, gin.H{"error": "Catalog record not found"})
+		} else {
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		}
 		return
 	}
 	ctx.JSON(http.StatusOK, catalogRecord)
