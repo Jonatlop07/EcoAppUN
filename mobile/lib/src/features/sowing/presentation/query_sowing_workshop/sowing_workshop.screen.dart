@@ -72,7 +72,31 @@ class SowingWorkshopScreen extends ConsumerWidget {
                 textAlign: TextAlign.center,
               ),
             ),
+            gapH16,
+            Padding(
+              padding: insetsAll12,
+              child: CustomText(
+                text: 'Fecha del evento: ${sowingWorkshop.date.toString()}',
+                textAlign: TextAlign.center,
+              ),
+            ),
             gapH8,
+            Padding(
+              padding: insetsAll12,
+              child: CustomText(
+                text: 'Hora de inicio: ${sowingWorkshop.startTime.toString()}',
+                textAlign: TextAlign.center,
+              ),
+            ),
+            gapH8,
+            Padding(
+              padding: insetsAll12,
+              child: CustomText(
+                text: 'Hora de finalización: ${sowingWorkshop.endTime.toString()}',
+                textAlign: TextAlign.center,
+              ),
+            ),
+            gapH16,
             Padding(
               padding: insetsAll4,
               child: Subtitle(

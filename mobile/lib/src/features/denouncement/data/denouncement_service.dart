@@ -5,14 +5,16 @@ import 'package:mobile/src/features/denouncement/presentation/edit_catalog_recor
 import '../domain/denouncement.dart';
 
 class DenouncementService {
-  final String baseUrl = 'https://api.example.com'; // Reemplaza con la URL correcta de la API
+  final String baseUrl = 'http://localhost:8083'; // Reemplaza con la URL correcta de la API
   final Dio _dio = Dio();
 
   Future<List<Denouncement>> getDenouncements() async {
     try {
       final response = await _dio.get('$baseUrl/denouncements');
       return List<Denouncement>.from(
-        (response.data as List).map((denouncement) => Denouncement.fromJson(denouncement)),
+        response.data['denouncements'].map(
+          (denouncement) => Denouncement.fromJson(denouncement),
+        ),
       );
     } catch (e) {
       throw Exception('Failed to get denouncements. Error: $e');
@@ -43,7 +45,7 @@ class DenouncementService {
         '$baseUrl/denouncements/${denouncement.id}',
         data: denouncement.toJson(),
       );
-      return response.data['denouncement_record_id'].toString();
+      return response.data['denouncement_id'].toString();
     } catch (e) {
       throw Exception('Failed to update denouncement. Error: $e');
     }

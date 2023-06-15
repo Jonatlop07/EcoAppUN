@@ -204,11 +204,7 @@ func FromDenouncementModel(model DenouncementModel) Denouncement {
 }
 
 func FromMultimediaElementModel(multimediaModel DenouncementMultimediaModel) DenouncementMultimedia {
-	return DenouncementMultimedia{
-		Description: multimediaModel.Description,
-		SubmitedAt:  multimediaModel.SubmitedAt,
-		Uri:         multimediaModel.Uri,
-	}
+	return DenouncementMultimedia(multimediaModel)
 }
 
 func FromCommentModel(comment CommentModel) Comment {

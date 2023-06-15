@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile/src/shared/common_widgets/navbar.dart';
@@ -73,7 +72,31 @@ class EcorecoveryWorkshopScreen extends ConsumerWidget {
                 textAlign: TextAlign.center,
               ),
             ),
+            gapH16,
+            Padding(
+              padding: insetsAll12,
+              child: CustomText(
+                text: 'Fecha del evento: ${ecorecoveryWorkshop.date.toString()}',
+                textAlign: TextAlign.center,
+              ),
+            ),
             gapH8,
+            Padding(
+              padding: insetsAll12,
+              child: CustomText(
+                text: 'Hora de inicio: ${ecorecoveryWorkshop.startTime.toString()}',
+                textAlign: TextAlign.center,
+              ),
+            ),
+            gapH8,
+            Padding(
+              padding: insetsAll12,
+              child: CustomText(
+                text: 'Hora de finalización: ${ecorecoveryWorkshop.endTime.toString()}',
+                textAlign: TextAlign.center,
+              ),
+            ),
+            gapH16,
             Padding(
               padding: insetsAll4,
               child: Subtitle(

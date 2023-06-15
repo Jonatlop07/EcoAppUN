@@ -5,7 +5,7 @@ import '../domain/catalog.dart';
 import 'catalog_record_details.dart';
 
 class CatalogService {
-  final String baseUrl = 'http://localhost:8083'; // Reemplaza con la URL correcta de la API
+  final String baseUrl = 'http://localhost:8083';
   final Dio _dio = Dio();
 
   Future<String> createCatalogRecord(CatalogRecordDetails catalogRecordDetails) async {

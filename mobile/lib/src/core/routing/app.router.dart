@@ -8,6 +8,11 @@ import '../../features/catalog/domain/catalog.dart';
 import '../../features/catalog/presentation/catalog_query/catalog.screen.dart';
 import '../../features/catalog/presentation/catalog_record_query/catalog_record.screen.dart';
 import '../../features/catalog/presentation/create_catalog_record/create_catalog_record.screen.dart';
+import '../../features/denouncement/domain/denouncement.dart';
+import '../../features/denouncement/presentation/denouncement_query/denouncement.screen.dart';
+import '../../features/denouncement/presentation/create_denouncement/create_denouncement.screen.dart';
+import '../../features/denouncement/presentation/denouncements_feed/denouncements_feed.screen.dart';
+import '../../features/denouncement/presentation/edit_catalog_record/edit_denouncement.screen.dart';
 import '../../features/ecorecovery/domain/ecorecovery.dart';
 import '../../features/ecorecovery/presentation/create_ecorecovery_workshop/create_ecorecovery_workshop.screen.dart';
 import '../../features/ecorecovery/presentation/ecorecovery_workshops_feed/ecorecovery_workshops_feed.screen.dart';
@@ -31,6 +36,87 @@ final goRouterProvider = Provider<GoRouter>((ref) {
     debugLogDiagnostics: true,
     routes: [
       GoRoute(
+        path: '/',
+        name: Routes.denouncements,
+        pageBuilder: (context, state) => TransitionScreen.createFade(
+          context,
+          state,
+          DenouncementsFeedScreen(
+            onDenouncementSelected: (Denouncement denouncement) {
+              context.pushNamed(
+                Routes.queryDenouncement,
+                pathParameters: {"denouncementId": denouncement.id},
+                extra: denouncement.toJson(),
+              );
+            },
+            onEditDenouncement: (Denouncement denouncement) {
+              context.pushNamed(
+                Routes.editDenouncement,
+                pathParameters: {"denouncementId": denouncement.id},
+                extra: denouncement.toJson(),
+              );
+            },
+            onDeleteDenouncement: (String denouncementId) {
+              context.pushNamed(Routes.denouncements);
+            },
+            onCreateNewDenouncement: () {
+              context.pushNamed(Routes.createDenouncement);
+            },
+          ),
+        ),
+        routes: [
+          GoRoute(
+            path: 'create',
+            name: Routes.createDenouncement,
+            pageBuilder: (context, state) => TransitionScreen.createFade(
+              context,
+              state,
+              const CreateDenouncementScreen(),
+            ),
+          ),
+          GoRoute(
+            path: 'edit/:denouncementId',
+            name: Routes.editDenouncement,
+            pageBuilder: (context, state) {
+              final data = state.extra as Map<String, dynamic>;
+              Denouncement denouncement = Denouncement.fromJson(data);
+              return TransitionScreen.createFade(
+                context,
+                state,
+                EditDenouncementScreen(
+                  denouncement: denouncement,
+                ),
+              );
+            },
+          ),
+          GoRoute(
+            path: ':denouncementId',
+            name: Routes.queryDenouncement,
+            pageBuilder: (context, state) {
+              final data = state.extra as Map<String, dynamic>;
+              Denouncement denouncement = Denouncement.fromJson(data);
+              return TransitionScreen.createFade(
+                context,
+                state,
+                DenouncementScreen(
+                  denouncement: denouncement,
+                  onEditDenouncement: (Denouncement denouncement) {
+                    context.pushNamed(
+                      Routes.editDenouncement,
+                      pathParameters: {"denouncementId": denouncement.id},
+                      extra: denouncement.toJson(),
+                    );
+                  },
+                  onDeleteDenouncement: (String denouncementId) {
+                    context.pushNamed(Routes.denouncements);
+                  },
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+      /*GoRoute(
         path: '/',
         name: Routes.ecotours,
         pageBuilder: (context, state) => TransitionScreen.createFade(
@@ -89,7 +175,6 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             name: Routes.queryEcotour,
             pageBuilder: (context, state) {
               final data = state.extra as Map<String, dynamic>;
-              debugPrint(data.toString());
               Ecotour ecotour = Ecotour.fromJson(data);
               return TransitionScreen.createFade(
                 context,
@@ -111,7 +196,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             },
           ),
         ],
-      ),
+      ),*/
       /*GoRoute(
         path: '/',
         name: Routes.ecorecoveryWorkshops,

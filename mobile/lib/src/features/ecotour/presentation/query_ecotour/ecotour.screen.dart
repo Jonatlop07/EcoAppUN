@@ -73,6 +73,30 @@ class EcotourScreen extends ConsumerWidget {
             ),
             gapH16,
             Padding(
+              padding: insetsAll12,
+              child: CustomText(
+                text: 'Fecha del evento: ${ecotour.date.toString()}',
+                textAlign: TextAlign.center,
+              ),
+            ),
+            gapH8,
+            Padding(
+              padding: insetsAll12,
+              child: CustomText(
+                text: 'Hora de inicio: ${ecotour.startTime.toString()}',
+                textAlign: TextAlign.center,
+              ),
+            ),
+            gapH8,
+            Padding(
+              padding: insetsAll12,
+              child: CustomText(
+                text: 'Hora de finalización: ${ecotour.endTime.toString()}',
+                textAlign: TextAlign.center,
+              ),
+            ),
+            gapH16,
+            Padding(
               padding: insetsAll16,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
