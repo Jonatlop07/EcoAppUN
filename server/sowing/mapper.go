@@ -105,3 +105,57 @@ func FromAttendee(attendee Attendee) AttendeeModel {
 		Seeds: modelSeeds,
 	}
 }
+
+func FromSowingWorkshopModel(sowingWorkshopModel SowingWorkshopModel) SowingWorkshop {
+	sowingWorkshopID := sowingWorkshopModel.ID.Hex()
+	authorID := sowingWorkshopModel.AuthorID.Hex()
+	organizers := []string{}
+	seeds := []Seed{}
+	attendees := []Attendee{}
+	for _, organizerID := range sowingWorkshopModel.Organizers {
+		organizers = append(organizers, organizerID.Hex())
+	}
+	for _, seedModel := range sowingWorkshopModel.Seeds {
+		seeds = append(seeds, FromSeedModel(seedModel))
+	}
+	for _, attendeeModel := range sowingWorkshopModel.Attendees {
+		attendees = append(attendees, FromAttendeeModel(attendeeModel))
+	}
+	return SowingWorkshop{
+		ID:           sowingWorkshopID,
+		AuthorID:     authorID,
+		Title:        sowingWorkshopModel.Title,
+		CreatedAt:    sowingWorkshopModel.CreatedAt,
+		UpdatedAt:    sowingWorkshopModel.UpdatedAt,
+		Date:         sowingWorkshopModel.Date,
+		StartTime:    sowingWorkshopModel.StartTime,
+		EndTime:      sowingWorkshopModel.EndTime,
+		MeetupPoint:  sowingWorkshopModel.MeetupPoint,
+		Description:  sowingWorkshopModel.Description,
+		Organizers:   organizers,
+		Attendees:    attendees,
+		Instructions: sowingWorkshopModel.Instructions,
+		Objectives:   sowingWorkshopModel.Objectives,
+		Seeds:        seeds,
+	}
+}
+
+func FromSeedModel(seedModel SeedModel) Seed {
+	return Seed{
+		ID:              seedModel.ID.Hex(),
+		Description:     seedModel.Description,
+		ImageLink:       seedModel.ImageLink,
+		AvailableAmount: seedModel.AvailableAmount,
+	}
+}
+
+func FromAttendeeModel(attendeeModel AttendeeModel) Attendee {
+	seeds := []Seed{}
+	for _, seedModel := range attendeeModel.Seeds {
+		seeds = append(seeds, FromSeedModel(seedModel))
+	}
+	return Attendee{
+		ID:    attendeeModel.ID.Hex(),
+		Seeds: seeds,
+	}
+}

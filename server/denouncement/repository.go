@@ -23,7 +23,7 @@ type DenouncementRepository interface {
 	) (ResponseReaction, error)
 	GetByID(id string) (*Denouncement, error)
 	GetAll() ([]Denouncement, error)
-	Update(denouncement Denouncement) error
+	Update(denouncement Denouncement) (Denouncement, error)
 	Delete(denouncementId string) error
 	DeleteComment(ids CommentIdentifiersDTO) error
 	DeleteResponse(ids ResponseIdentifiersDTO) error
@@ -45,14 +45,14 @@ func (r *MongoDBDenouncementRepository) Create(denouncementDetails DenouncementD
 	return result.InsertedID.(primitive.ObjectID).Hex(), nil
 }
 
-func (r *MongoDBDenouncementRepository) Update(denouncement Denouncement) error {
+func (r *MongoDBDenouncementRepository) Update(denouncement Denouncement) (Denouncement, error) {
 	denouncementModel := FromDenouncement(denouncement)
 	denouncementModel.UpdatedAt = time.Now()
 	_, err := r.DenouncementsCollection.ReplaceOne(context.TODO(), bson.M{"_id": denouncementModel.ID}, denouncementModel)
 	if err != nil {
-		return err
+		return Denouncement{}, err
 	}
-	return nil
+	return FromDenouncementModel(denouncementModel), nil
 }
 
 func (r *MongoDBDenouncementRepository) Delete(id string) error {

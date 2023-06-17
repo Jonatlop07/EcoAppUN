@@ -55,24 +55,22 @@ func (controller *CatalogController) GetAllCatalogRecords(ctx *gin.Context) {
 }
 
 func (controller *CatalogController) UpdateCatalogRecord(ctx *gin.Context) {
-	id := ctx.Param("id")
 	var catalogRecord CatalogRecord
 	if err := ctx.ShouldBindJSON(&catalogRecord); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	catalogRecord.ID = id
 	validate := validator.New()
 	if err := validate.Struct(catalogRecord); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	err := controller.Gateway.Update(catalogRecord)
+	updatedCatalogRecord, err := controller.Gateway.Update(catalogRecord)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	ctx.JSON(http.StatusOK, gin.H{"catalog_record_id": id})
+	ctx.JSON(http.StatusOK, gin.H{"catalog_record_id": updatedCatalogRecord.ID})
 }
 
 func (controller *CatalogController) DeleteCatalogRecord(ctx *gin.Context) {
@@ -87,17 +85,22 @@ func (controller *CatalogController) DeleteCatalogRecord(ctx *gin.Context) {
 
 func (controller *CatalogController) AddSpeciesImageToCatalogRecord(ctx *gin.Context) {
 	id := ctx.Param("id")
-	var image Image
-	if err := ctx.ShouldBindJSON(&image); err != nil {
+	var ImageDetails ImageDetails
+	if err := ctx.ShouldBindJSON(&ImageDetails); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	err := controller.Gateway.AddSpeciesImage(id, image)
+	validate := validator.New()
+	if err := validate.Struct(ImageDetails); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	addedImage, err := controller.Gateway.AddSpeciesImage(id, ImageDetails)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	ctx.JSON(http.StatusOK, gin.H{"added_image": image})
+	ctx.JSON(http.StatusOK, gin.H{"image_id": addedImage.ID})
 }
 
 func ProvideCatalogController(catalogRepository CatalogRepository) *CatalogController {

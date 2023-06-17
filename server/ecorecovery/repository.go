@@ -11,10 +11,10 @@ import (
 )
 
 type EcorecoveryWorkshopRepository interface {
-	Create(workshopDetails EcorecoveryWorkshopDetails) (string, error)
+	Create(workshopDetails EcorecoveryWorkshopDetails) (EcorecoveryWorkshop, error)
 	GetByID(id string) (*EcorecoveryWorkshop, error)
 	GetAll() ([]EcorecoveryWorkshop, error)
-	Update(workshop EcorecoveryWorkshop) error
+	Update(workshop EcorecoveryWorkshop) (EcorecoveryWorkshop, error)
 	Delete(id string) error
 	AddAttendee(workshopID string, attendeeID string) error
 	RemoveAttendee(workshopID string, attendeeID string) error
@@ -25,14 +25,14 @@ type MongoDBEcorecoveryWorkshopRepository struct {
 	EcorecoveryWorkshopsCollection *mongo.Collection
 }
 
-func (repository *MongoDBEcorecoveryWorkshopRepository) Create(workshopDetails EcorecoveryWorkshopDetails) (string, error) {
+func (repository *MongoDBEcorecoveryWorkshopRepository) Create(workshopDetails EcorecoveryWorkshopDetails) (EcorecoveryWorkshop, error) {
 	workshop := FromDetails(workshopDetails)
 	workshopModel := FromEcorecoveryWorkshop(workshop)
-	result, err := repository.EcorecoveryWorkshopsCollection.InsertOne(context.TODO(), workshopModel)
+	_, err := repository.EcorecoveryWorkshopsCollection.InsertOne(context.TODO(), workshopModel)
 	if err != nil {
-		return "", err
+		return EcorecoveryWorkshop{}, err
 	}
-	return result.InsertedID.(primitive.ObjectID).Hex(), nil
+	return workshop, nil
 }
 
 func (repository *MongoDBEcorecoveryWorkshopRepository) GetByID(id string) (*EcorecoveryWorkshop, error) {
@@ -60,14 +60,14 @@ func (repository *MongoDBEcorecoveryWorkshopRepository) GetAll() ([]EcorecoveryW
 	return workshops, nil
 }
 
-func (repository *MongoDBEcorecoveryWorkshopRepository) Update(workshop EcorecoveryWorkshop) error {
+func (repository *MongoDBEcorecoveryWorkshopRepository) Update(workshop EcorecoveryWorkshop) (EcorecoveryWorkshop, error) {
 	workshopModel := FromEcorecoveryWorkshop(workshop)
 	workshopModel.UpdatedAt = time.Now()
 	_, err := repository.EcorecoveryWorkshopsCollection.UpdateOne(context.TODO(), bson.M{"_id": workshopModel.ID}, workshopModel)
 	if err != nil {
-		return err
+		return EcorecoveryWorkshop{}, err
 	}
-	return nil
+	return FromEcorecoveryWorkshopModel(workshopModel), nil
 }
 
 func (repository *MongoDBEcorecoveryWorkshopRepository) Delete(id string) error {

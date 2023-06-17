@@ -7,23 +7,23 @@ import (
 )
 
 type EcorecoveryWorkshopModel struct {
-	ID           primitive.ObjectID   `bson:"_id" json:"id"`
-	AuthorID     primitive.ObjectID   `bson:"authorId" json:"author_id"`
-	Title        string               `bson:"title" json:"title"`
-	CreatedAt    time.Time            `bson:"createdAt" json:"created_at"`
-	UpdatedAt    time.Time            `bson:"updatedAt" json:"updated_at"`
-	Date         time.Time            `bson:"date" json:"date"`
-	StartTime    time.Time            `bson:"startTime" json:"start_time"`
-	EndTime      time.Time            `bson:"endTime" json:"end_time"`
-	MeetupPoint  string               `bson:"meetupPoint" json:"meetup_point"`
-	Description  string               `bson:"description" json:"description"`
-	Organizers   []primitive.ObjectID `bson:"organizers" json:"organizers"`
-	Attendees    []primitive.ObjectID `bson:"attendees" json:"attendees"`
-	Instructions []string             `bson:"instructions" json:"instructions"`
-	Objectives   []Objective          `bson:"objectives" json:"objectives"`
+	ID           primitive.ObjectID   `bson:"_id" validate:"required"`
+	AuthorID     primitive.ObjectID   `bson:"authorId" validate:"required"`
+	Title        string               `bson:"title" validate:"required"`
+	CreatedAt    time.Time            `bson:"createdAt" validate:"required"`
+	UpdatedAt    time.Time            `bson:"updatedAt" validate:"required"`
+	Date         time.Time            `bson:"date" validate:"required"`
+	StartTime    time.Time            `bson:"startTime" validate:"required"`
+	EndTime      time.Time            `bson:"endTime" validate:"required"`
+	MeetupPoint  string               `bson:"meetupPoint" validate:"required"`
+	Description  string               `bson:"description" validate:"required"`
+	Organizers   []primitive.ObjectID `bson:"organizers" validate:"required"`
+	Attendees    []primitive.ObjectID `bson:"attendees" validate:"required"`
+	Instructions []string             `bson:"instructions" validate:"required"`
+	Objectives   []Objective          `bson:"objectives" validate:"required"`
 }
 
 type ObjectiveModel struct {
-	Description string `bson:"description" json:"description"`
-	IsAchieved  bool   `bson:"isAchieved" json:"is_achieved"`
+	Description string `bson:"description" validate:"required"`
+	IsAchieved  bool   `bson:"isAchieved" validate:"required"`
 }

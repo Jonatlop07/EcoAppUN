@@ -53,3 +53,30 @@ func FromEcotour(ecotour Ecotour) EcotourModel {
 		Attendees:   modelAttendees,
 	}
 }
+
+func FromEcotourModel(ecotourModel EcotourModel) Ecotour {
+	ecotourID := ecotourModel.ID.Hex()
+	authorID := ecotourModel.AuthorID.Hex()
+	organizers := []string{}
+	attendees := []string{}
+	for _, organizerID := range ecotourModel.Organizers {
+		organizers = append(organizers, organizerID.Hex())
+	}
+	for _, attendeeID := range ecotourModel.Attendees {
+		attendees = append(attendees, attendeeID.Hex())
+	}
+	return Ecotour{
+		ID:          ecotourID,
+		AuthorID:    authorID,
+		Title:       ecotourModel.Title,
+		CreatedAt:   ecotourModel.CreatedAt,
+		UpdatedAt:   ecotourModel.UpdatedAt,
+		Date:        ecotourModel.Date,
+		StartTime:   ecotourModel.StartTime,
+		EndTime:     ecotourModel.EndTime,
+		MeetupPoint: ecotourModel.MeetupPoint,
+		Description: ecotourModel.Description,
+		Organizers:  organizers,
+		Attendees:   attendees,
+	}
+}

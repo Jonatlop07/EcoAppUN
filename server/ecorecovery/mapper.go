@@ -64,3 +64,32 @@ func FromEcorecoveryWorkshop(ecorecoveryWorkshop EcorecoveryWorkshop) Ecorecover
 		Objectives:   ecorecoveryWorkshop.Objectives,
 	}
 }
+
+func FromEcorecoveryWorkshopModel(ecorecoveryWorkshopModel EcorecoveryWorkshopModel) EcorecoveryWorkshop {
+	ecorecoveryWorkshopID := ecorecoveryWorkshopModel.ID.Hex()
+	authorID := ecorecoveryWorkshopModel.AuthorID.Hex()
+	organizers := []string{}
+	attendees := []string{}
+	for _, organizerID := range ecorecoveryWorkshopModel.Organizers {
+		organizers = append(organizers, organizerID.Hex())
+	}
+	for _, attendeeID := range ecorecoveryWorkshopModel.Attendees {
+		attendees = append(attendees, attendeeID.Hex())
+	}
+	return EcorecoveryWorkshop{
+		ID:           ecorecoveryWorkshopID,
+		AuthorID:     authorID,
+		Title:        ecorecoveryWorkshopModel.Title,
+		CreatedAt:    ecorecoveryWorkshopModel.CreatedAt,
+		UpdatedAt:    ecorecoveryWorkshopModel.UpdatedAt,
+		Date:         ecorecoveryWorkshopModel.Date,
+		StartTime:    ecorecoveryWorkshopModel.StartTime,
+		EndTime:      ecorecoveryWorkshopModel.EndTime,
+		MeetupPoint:  ecorecoveryWorkshopModel.MeetupPoint,
+		Description:  ecorecoveryWorkshopModel.Description,
+		Organizers:   organizers,
+		Attendees:    attendees,
+		Instructions: ecorecoveryWorkshopModel.Instructions,
+		Objectives:   ecorecoveryWorkshopModel.Objectives,
+	}
+}

@@ -23,12 +23,12 @@ func (controller *SowingWorkshopController) CreateWorkshop(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	sowingWorkshopID, err := controller.Gateway.Create(sowingWorkshopDetails)
+	createdWorkshop, err := controller.Gateway.Create(sowingWorkshopDetails)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	ctx.JSON(http.StatusCreated, gin.H{"sowing_workshop_id": sowingWorkshopID})
+	ctx.JSON(http.StatusCreated, gin.H{"workshop_id": createdWorkshop.ID})
 }
 
 func (controller *SowingWorkshopController) GetWorkshopByID(ctx *gin.Context) {
@@ -42,7 +42,7 @@ func (controller *SowingWorkshopController) GetWorkshopByID(ctx *gin.Context) {
 		}
 		return
 	}
-	ctx.JSON(http.StatusOK, sowingWorkshop)
+	ctx.JSON(http.StatusOK, gin.H{"workshop": sowingWorkshop})
 }
 
 func (controller *SowingWorkshopController) GetAllWorkshops(ctx *gin.Context) {
@@ -51,26 +51,25 @@ func (controller *SowingWorkshopController) GetAllWorkshops(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	ctx.JSON(http.StatusOK, sowingWorkshops)
+	ctx.JSON(http.StatusOK, gin.H{"workshops": sowingWorkshops})
 }
 
 func (controller *SowingWorkshopController) UpdateWorkshop(ctx *gin.Context) {
-	sowingWorkshopID := ctx.Param("id")
 	var sowingWorkshop SowingWorkshop
 	if err := ctx.ShouldBindJSON(&sowingWorkshop); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	sowingWorkshop.ID = sowingWorkshopID
 	validate := validator.New()
 	if err := validate.Struct(sowingWorkshop); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 	}
-	if err := controller.Gateway.Update(sowingWorkshop); err != nil {
+	updatedWorkshop, err := controller.Gateway.Update(sowingWorkshop)
+	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	ctx.JSON(http.StatusOK, sowingWorkshop)
+	ctx.JSON(http.StatusOK, gin.H{"workshop_id": updatedWorkshop.ID})
 }
 
 func (controller *SowingWorkshopController) DeleteWorkshop(ctx *gin.Context) {
@@ -89,12 +88,13 @@ func (controller *SowingWorkshopController) AddAttendee(ctx *gin.Context) {
 		return
 	}
 	sowingWorkshopID := ctx.Param("id")
-	attendee.ID = ctx.Param("attendee_id")
-	if err := controller.Gateway.AddAttendee(sowingWorkshopID, attendee); err != nil {
+
+	addedAttendee, err := controller.Gateway.AddAttendee(sowingWorkshopID, attendee)
+	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	ctx.Status(http.StatusOK)
+	ctx.JSON(http.StatusOK, gin.H{"attendee": addedAttendee})
 }
 
 func (controller *SowingWorkshopController) RemoveAttendee(ctx *gin.Context) {
@@ -119,7 +119,7 @@ func (controller *SowingWorkshopController) UpdateObjectives(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	ctx.JSON(http.StatusOK, updatedObjectives)
+	ctx.JSON(http.StatusOK, gin.H{"objectives": updatedObjectives})
 }
 
 func ProvideSowingController(sowingWorkshopRepository SowingWorkshopRepository) *SowingWorkshopController {

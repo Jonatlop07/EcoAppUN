@@ -22,12 +22,12 @@ func (controller *EcorecoveryWorkshopController) CreateWorkshop(ctx *gin.Context
 	if err := validate.Struct(workshopDetails); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 	}
-	workshopID, err := controller.Gateway.Create(workshopDetails)
+	createdWorkshop, err := controller.Gateway.Create(workshopDetails)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	ctx.JSON(http.StatusCreated, gin.H{"ecorecovery_workshop_id": workshopID})
+	ctx.JSON(http.StatusCreated, gin.H{"workshop_id": createdWorkshop.ID})
 }
 
 func (controller *EcorecoveryWorkshopController) GetWorkshopByID(ctx *gin.Context) {
@@ -41,7 +41,7 @@ func (controller *EcorecoveryWorkshopController) GetWorkshopByID(ctx *gin.Contex
 		}
 		return
 	}
-	ctx.JSON(http.StatusOK, workshop)
+	ctx.JSON(http.StatusOK, gin.H{"workshop": workshop})
 }
 
 func (controller *EcorecoveryWorkshopController) GetAllWorkshops(ctx *gin.Context) {
@@ -50,26 +50,25 @@ func (controller *EcorecoveryWorkshopController) GetAllWorkshops(ctx *gin.Contex
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	ctx.JSON(http.StatusOK, workshops)
+	ctx.JSON(http.StatusOK, gin.H{"workshops": workshops})
 }
 
 func (controller *EcorecoveryWorkshopController) UpdateWorkshop(ctx *gin.Context) {
-	workshopID := ctx.Param("id")
 	var workshop EcorecoveryWorkshop
 	if err := ctx.ShouldBindJSON(&workshop); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	workshop.ID = workshopID
 	validate := validator.New()
 	if err := validate.Struct(workshop); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 	}
-	if err := controller.Gateway.Update(workshop); err != nil {
+	updatedWorkshop, err := controller.Gateway.Update(workshop)
+	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	ctx.JSON(http.StatusOK, workshop)
+	ctx.JSON(http.StatusOK, gin.H{"workshop_id": updatedWorkshop.ID})
 }
 
 func (controller *EcorecoveryWorkshopController) DeleteWorkshop(ctx *gin.Context) {
@@ -84,7 +83,8 @@ func (controller *EcorecoveryWorkshopController) DeleteWorkshop(ctx *gin.Context
 func (controller *EcorecoveryWorkshopController) AddAttendee(ctx *gin.Context) {
 	workshopID := ctx.Param("id")
 	attendeeID := ctx.Param("attendee_id")
-	if err := controller.Gateway.AddAttendee(workshopID, attendeeID); err != nil {
+	err := controller.Gateway.AddAttendee(workshopID, attendeeID)
+	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -113,7 +113,7 @@ func (controller *EcorecoveryWorkshopController) UpdateObjectives(ctx *gin.Conte
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	ctx.JSON(http.StatusOK, updatedObjectives)
+	ctx.JSON(http.StatusOK, gin.H{"objectives": updatedObjectives})
 }
 
 func ProvideEcorecoveryWorkshopController(ecorecoveryWorkshopRepository EcorecoveryWorkshopRepository) *EcorecoveryWorkshopController {

@@ -11,12 +11,12 @@ import (
 )
 
 type SowingWorkshopRepository interface {
-	Create(sowingWorkshopDetails SowingWorkshopDetails) (string, error)
+	Create(sowingWorkshopDetails SowingWorkshopDetails) (SowingWorkshop, error)
 	GetByID(id string) (*SowingWorkshop, error)
 	GetAll() ([]SowingWorkshop, error)
-	Update(workshop SowingWorkshop) error
+	Update(workshop SowingWorkshop) (SowingWorkshop, error)
 	Delete(id string) error
-	AddAttendee(sowingWorkshopId string, attendee Attendee) error
+	AddAttendee(sowingWorkshopId string, attendee Attendee) (Attendee, error)
 	RemoveAttendee(sowingWorkshopId string, attendeeId string) error
 	UpdateObjectives(sowingWorkshopId string, objectives []Objective) ([]Objective, error)
 }
@@ -25,14 +25,14 @@ type MongoDBSowingWorkshopRepository struct {
 	SowingWorkshopsCollection *mongo.Collection
 }
 
-func (repository *MongoDBSowingWorkshopRepository) Create(sowingWorkshopDetails SowingWorkshopDetails) (string, error) {
+func (repository *MongoDBSowingWorkshopRepository) Create(sowingWorkshopDetails SowingWorkshopDetails) (SowingWorkshop, error) {
 	sowingWorkshop := FromDetails(sowingWorkshopDetails)
 	sowingWorkshopModel := FromSowingWorkshop(sowingWorkshop)
-	result, err := repository.SowingWorkshopsCollection.InsertOne(context.TODO(), sowingWorkshopModel)
+	_, err := repository.SowingWorkshopsCollection.InsertOne(context.TODO(), sowingWorkshopModel)
 	if err != nil {
-		return "", err
+		return SowingWorkshop{}, err
 	}
-	return result.InsertedID.(primitive.ObjectID).Hex(), nil
+	return sowingWorkshop, nil
 }
 
 func (repository *MongoDBSowingWorkshopRepository) GetByID(id string) (*SowingWorkshop, error) {
@@ -60,14 +60,14 @@ func (repository *MongoDBSowingWorkshopRepository) GetAll() ([]SowingWorkshop, e
 	return workshops, nil
 }
 
-func (repository *MongoDBSowingWorkshopRepository) Update(workshop SowingWorkshop) error {
+func (repository *MongoDBSowingWorkshopRepository) Update(workshop SowingWorkshop) (SowingWorkshop, error) {
 	workshopModel := FromSowingWorkshop(workshop)
 	workshopModel.UpdatedAt = time.Now()
 	_, err := repository.SowingWorkshopsCollection.ReplaceOne(context.TODO(), bson.M{"_id": workshop.ID}, workshopModel)
 	if err != nil {
-		return err
+		return SowingWorkshop{}, err
 	}
-	return nil
+	return FromSowingWorkshopModel(workshopModel), nil
 }
 
 func (repository *MongoDBSowingWorkshopRepository) Delete(id string) error {
@@ -82,11 +82,11 @@ func (repository *MongoDBSowingWorkshopRepository) Delete(id string) error {
 	return nil
 }
 
-func (repository *MongoDBSowingWorkshopRepository) AddAttendee(sowingWorkshopId string, attendee Attendee) error {
+func (repository *MongoDBSowingWorkshopRepository) AddAttendee(sowingWorkshopId string, attendee Attendee) (Attendee, error) {
 	repository.RemoveAttendee(sowingWorkshopId, attendee.ID)
 	seeds, err := repository.getSeeds(sowingWorkshopId)
 	if err != nil {
-		return err
+		return Attendee{}, err
 	}
 	seedsWithAddition := repository.seedsWithAddition(seeds, attendee.Seeds)
 	filter := bson.M{"_id": sowingWorkshopId}
@@ -98,9 +98,9 @@ func (repository *MongoDBSowingWorkshopRepository) AddAttendee(sowingWorkshopId 
 	}
 	_, err = repository.SowingWorkshopsCollection.UpdateOne(context.TODO(), filter, update)
 	if err != nil {
-		return err
+		return Attendee{}, err
 	}
-	return nil
+	return attendee, nil
 }
 
 func (repository *MongoDBSowingWorkshopRepository) RemoveAttendee(sowingWorkshopId string, attendeeID string) error {

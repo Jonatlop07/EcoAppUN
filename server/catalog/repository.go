@@ -13,9 +13,9 @@ type CatalogRepository interface {
 	Create(catalogRecordDetails CatalogRecordDetails) (string, error)
 	GetByID(id string) (*CatalogRecord, error)
 	GetAll() ([]CatalogRecord, error)
-	Update(catalogRecord CatalogRecord) error
+	Update(catalogRecord CatalogRecord) (CatalogRecord, error)
 	Delete(id string) error
-	AddSpeciesImage(catalogRecordId string, imageDetails Image) error
+	AddSpeciesImage(catalogRecordId string, imageDetails ImageDetails) (Image, error)
 }
 
 type MongoDBCatalogRepository struct {
@@ -59,14 +59,14 @@ func (repository *MongoDBCatalogRepository) GetAll() ([]CatalogRecord, error) {
 	return catalogRecords, nil
 }
 
-func (repository *MongoDBCatalogRepository) Update(catalogRecord CatalogRecord) error {
+func (repository *MongoDBCatalogRepository) Update(catalogRecord CatalogRecord) (CatalogRecord, error) {
 	catalogRecordModel := FromCatalogRecord(catalogRecord)
 	catalogRecordModel.UpdatedAt = time.Now()
 	_, err := repository.CatalogRecordsCollection.ReplaceOne(context.TODO(), bson.M{"_id": catalogRecordModel.ID}, catalogRecordModel)
 	if err != nil {
-		return err
+		return CatalogRecord{}, err
 	}
-	return nil
+	return FromCatalogRecordModel(catalogRecordModel), nil
 }
 
 func (repository *MongoDBCatalogRepository) Delete(id string) error {
@@ -81,19 +81,19 @@ func (repository *MongoDBCatalogRepository) Delete(id string) error {
 	return nil
 }
 
-func (repository *MongoDBCatalogRepository) AddSpeciesImage(catalogRecordId string, image Image) error {
-	catalogRecordModelId, _ := primitive.ObjectIDFromHex(catalogRecordId)
+func (repository *MongoDBCatalogRepository) AddSpeciesImage(catalogRecordId string, imageDetails ImageDetails) (Image, error) {
+	image := FromImageDetails(imageDetails)
 	imageModel := FromImage(image)
 	if imageModel.SubmitedAt.IsZero() {
 		imageModel.SubmitedAt = time.Now()
 	}
-	filter := bson.M{"_id": catalogRecordModelId}
+	filter := bson.M{"_id": catalogRecordId}
 	update := bson.M{"$push": bson.M{"images": imageModel}}
 	_, err := repository.CatalogRecordsCollection.UpdateOne(context.TODO(), filter, update)
 	if err != nil {
-		return err
+		return Image{}, err
 	}
-	return nil
+	return image, nil
 }
 
 func ProvideCatalogRepository(database *mongo.Database) CatalogRepository {

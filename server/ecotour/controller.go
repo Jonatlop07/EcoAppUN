@@ -22,12 +22,12 @@ func (controller *EcotourController) CreateEcotour(ctx *gin.Context) {
 	if err := validate.Struct(ecotourDetails); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 	}
-	ecotourId, err := controller.Gateway.Create(ecotourDetails)
+	createdEcotour, err := controller.Gateway.Create(ecotourDetails)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	ctx.JSON(http.StatusCreated, gin.H{"ecotour_id": ecotourId})
+	ctx.JSON(http.StatusCreated, gin.H{"ecotour_id": createdEcotour.ID})
 }
 
 func (controller *EcotourController) GetEcotourByID(ctx *gin.Context) {
@@ -41,7 +41,7 @@ func (controller *EcotourController) GetEcotourByID(ctx *gin.Context) {
 		}
 		return
 	}
-	ctx.JSON(http.StatusOK, ecotour)
+	ctx.JSON(http.StatusOK, gin.H{"ecotour": ecotour})
 }
 
 func (controller *EcotourController) GetAllEcotours(ctx *gin.Context) {
@@ -50,7 +50,7 @@ func (controller *EcotourController) GetAllEcotours(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	ctx.JSON(http.StatusOK, ecotours)
+	ctx.JSON(http.StatusOK, gin.H{"ecotours": ecotours})
 }
 
 func (controller *EcotourController) UpdateEcotour(ctx *gin.Context) {
@@ -65,11 +65,12 @@ func (controller *EcotourController) UpdateEcotour(ctx *gin.Context) {
 	if err := validate.Struct(ecotour); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 	}
-	if err := controller.Gateway.Update(ecotour); err != nil {
+	updatedEcotour, err := controller.Gateway.Update(ecotour)
+	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	ctx.JSON(http.StatusOK, ecotour)
+	ctx.JSON(http.StatusOK, gin.H{"ecotour_id": updatedEcotour.ID})
 }
 
 func (controller *EcotourController) DeleteEcotour(ctx *gin.Context) {

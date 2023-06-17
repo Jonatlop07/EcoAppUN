@@ -21,6 +21,7 @@ func (controller *DenouncementController) CreateDenouncement(ctx *gin.Context) {
 	validate := validator.New()
 	if err := validate.Struct(denouncementDetails); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
 	}
 	denouncementID, err := controller.Gateway.Create(denouncementDetails)
 	if err != nil {
@@ -31,7 +32,6 @@ func (controller *DenouncementController) CreateDenouncement(ctx *gin.Context) {
 }
 
 func (denouncementController *DenouncementController) UpdateDenouncement(ctx *gin.Context) {
-	denouncementID := ctx.Param("id")
 	var denouncement Denouncement
 	if err := ctx.ShouldBindJSON(&denouncement); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -40,12 +40,14 @@ func (denouncementController *DenouncementController) UpdateDenouncement(ctx *gi
 	validate := validator.New()
 	if err := validate.Struct(denouncement); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
 	}
-	if err := denouncementController.Gateway.Update(denouncement); err != nil {
+	updatedDenouncement, err := denouncementController.Gateway.Update(denouncement)
+	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	ctx.JSON(http.StatusOK, gin.H{"denouncement_id": denouncementID})
+	ctx.JSON(http.StatusOK, gin.H{"denouncement_id": updatedDenouncement.ID})
 }
 
 func (denouncementController *DenouncementController) DeleteDenouncement(ctx *gin.Context) {
@@ -92,15 +94,19 @@ func (denouncementController *DenouncementController) CreateComment(ctx *gin.Con
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	ctx.JSON(http.StatusOK, gin.H{"comment": createdComment})
+	ctx.JSON(http.StatusOK, gin.H{"comment_id": createdComment.ID})
 }
 
 func (denouncementController *DenouncementController) DeleteComment(ctx *gin.Context) {
 	denouncementID := ctx.Param("id")
 	commentID := ctx.Param("comment_id")
-	err := denouncementController.Gateway.DeleteComment(
-		CommentIdentifiersDTO{DenouncementID: denouncementID, CommentID: commentID},
-	)
+	idx := CommentIdentifiersDTO{DenouncementID: denouncementID, CommentID: commentID}
+	validate := validator.New()
+	if err := validate.Struct(idx); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	err := denouncementController.Gateway.DeleteComment(idx)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -116,31 +122,45 @@ func (denouncementController *DenouncementController) CreateCommentResponse(ctx 
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+	validate := validator.New()
+	if err := validate.Struct(responseDetails); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	idx := CommentIdentifiersDTO{
+		DenouncementID: denouncementID,
+		CommentID:      commentID,
+	}
+	if err := validate.Struct(idx); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
 	createdResponse, err := denouncementController.Gateway.CreateResponse(
-		CommentIdentifiersDTO{
-			DenouncementID: denouncementID,
-			CommentID:      commentID,
-		},
+		idx,
 		responseDetails,
 	)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	ctx.JSON(http.StatusOK, gin.H{"comment_response": createdResponse})
+	ctx.JSON(http.StatusOK, gin.H{"comment_response_id": createdResponse.ID})
 }
 
 func (denouncementController *DenouncementController) DeleteCommentResponse(ctx *gin.Context) {
 	denouncementID := ctx.Param("id")
 	commentID := ctx.Param("comment_id")
 	responseID := ctx.Param("response_id")
-	if err := denouncementController.Gateway.DeleteResponse(
-		ResponseIdentifiersDTO{
-			DenouncementID: denouncementID,
-			CommentID:      commentID,
-			ResponseID:     responseID,
-		},
-	); err != nil {
+	idx := ResponseIdentifiersDTO{
+		DenouncementID: denouncementID,
+		CommentID:      commentID,
+		ResponseID:     responseID,
+	}
+	validate := validator.New()
+	if err := validate.Struct(idx); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	if err := denouncementController.Gateway.DeleteResponse(idx); err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -155,11 +175,21 @@ func (denouncementController *DenouncementController) CreateCommentReaction(ctx 
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+	validate := validator.New()
+	if err := validate.Struct(reactionDetails); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	idx := CommentIdentifiersDTO{
+		DenouncementID: denouncementID,
+		CommentID:      commentID,
+	}
+	if err := validate.Struct(idx); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
 	createdReaction, err := denouncementController.Gateway.CreateCommentReaction(
-		CommentIdentifiersDTO{
-			DenouncementID: denouncementID,
-			CommentID:      commentID,
-		},
+		idx,
 		reactionDetails,
 	)
 	if err != nil {
@@ -173,13 +203,17 @@ func (denouncementController *DenouncementController) DeleteCommentReaction(ctx 
 	denouncementID := ctx.Param("id")
 	commentID := ctx.Param("comment_id")
 	authorID := ctx.Param("author_id")
-	if err := denouncementController.Gateway.DeleteCommentReaction(
-		CommentReactionIdentifiersDTO{
-			DenouncementID: denouncementID,
-			CommentID:      commentID,
-			AuthorID:       authorID,
-		},
-	); err != nil {
+	idx := CommentReactionIdentifiersDTO{
+		DenouncementID: denouncementID,
+		CommentID:      commentID,
+		AuthorID:       authorID,
+	}
+	validate := validator.New()
+	if err := validate.Struct(idx); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	if err := denouncementController.Gateway.DeleteCommentReaction(idx); err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -195,12 +229,18 @@ func (denouncementController *DenouncementController) CreateCommentResponseReact
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+	idx := ResponseIdentifiersDTO{
+		DenouncementID: denouncementID,
+		CommentID:      commentID,
+		ResponseID:     responseID,
+	}
+	validate := validator.New()
+	if err := validate.Struct(idx); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
 	createdReaction, err := denouncementController.Gateway.CreateResponseReaction(
-		ResponseIdentifiersDTO{
-			DenouncementID: denouncementID,
-			CommentID:      commentID,
-			ResponseID:     responseID,
-		},
+		idx,
 		reactionDetails,
 	)
 	if err != nil {
@@ -215,14 +255,18 @@ func (denouncementController *DenouncementController) DeleteCommentResponseReact
 	commentID := ctx.Param("comment_id")
 	responseID := ctx.Param("response_id")
 	authorID := ctx.Param("author_id")
-	if err := denouncementController.Gateway.DeleteResponseReaction(
-		ResponseReactionIdentifiersDTO{
-			DenouncementID: denouncementID,
-			CommentID:      commentID,
-			ResponseID:     responseID,
-			AuthorID:       authorID,
-		},
-	); err != nil {
+	idx := ResponseReactionIdentifiersDTO{
+		DenouncementID: denouncementID,
+		CommentID:      commentID,
+		ResponseID:     responseID,
+		AuthorID:       authorID,
+	}
+	validate := validator.New()
+	if err := validate.Struct(idx); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	if err := denouncementController.Gateway.DeleteResponseReaction(idx); err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}

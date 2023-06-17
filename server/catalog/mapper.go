@@ -10,17 +10,7 @@ func FromDetails(catalogRecordDetails CatalogRecordDetails) CatalogRecord {
 	catalogRecordID := primitive.NewObjectID().Hex()
 	images := []Image{}
 	for _, imageDetails := range catalogRecordDetails.Images {
-		images = append(
-			images,
-			Image{
-				ID:          primitive.NewObjectID().Hex(),
-				AuthorID:    imageDetails.AuthorID,
-				AuthorName:  imageDetails.AuthorName,
-				Description: imageDetails.Description,
-				SubmitedAt:  time.Now(),
-				URL:         imageDetails.URL,
-			},
-		)
+		images = append(images, FromImageDetails(imageDetails))
 	}
 	catalogRecord := CatalogRecord{
 		ID:             catalogRecordID,
@@ -34,6 +24,17 @@ func FromDetails(catalogRecordDetails CatalogRecordDetails) CatalogRecord {
 		Images:         images,
 	}
 	return catalogRecord
+}
+
+func FromImageDetails(imageDetails ImageDetails) Image {
+	return Image{
+		ID:          primitive.NewObjectID().Hex(),
+		AuthorID:    imageDetails.AuthorID,
+		AuthorName:  imageDetails.AuthorName,
+		Description: imageDetails.Description,
+		SubmitedAt:  time.Now(),
+		URL:         imageDetails.URL,
+	}
 }
 
 func FromCatalogRecord(catalogRecord CatalogRecord) CatalogRecordModel {

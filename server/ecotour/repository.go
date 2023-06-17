@@ -6,15 +6,14 @@ import (
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type EcotourRepository interface {
-	Create(ecotourDetails EcotourDetails) (string, error)
+	Create(ecotourDetails EcotourDetails) (Ecotour, error)
 	GetByID(id string) (*Ecotour, error)
 	GetAll() ([]Ecotour, error)
-	Update(ecotour Ecotour) error
+	Update(ecotour Ecotour) (Ecotour, error)
 	Delete(id string) error
 	AddAttendee(ecotourID string, attendeeID string) error
 	RemoveAttendee(ecotourID string, attendeeID string) error
@@ -24,14 +23,14 @@ type MongoDBEcotourRepository struct {
 	EcotoursCollection *mongo.Collection
 }
 
-func (repository *MongoDBEcotourRepository) Create(ecotourDetails EcotourDetails) (string, error) {
+func (repository *MongoDBEcotourRepository) Create(ecotourDetails EcotourDetails) (Ecotour, error) {
 	ecotour := FromDetails(ecotourDetails)
 	ecotourModel := FromEcotour(ecotour)
-	result, err := repository.EcotoursCollection.InsertOne(context.TODO(), ecotourModel)
+	_, err := repository.EcotoursCollection.InsertOne(context.TODO(), ecotourModel)
 	if err != nil {
-		return "", err
+		return Ecotour{}, err
 	}
-	return result.InsertedID.(primitive.ObjectID).Hex(), nil
+	return ecotour, nil
 }
 
 func (repository *MongoDBEcotourRepository) GetByID(id string) (*Ecotour, error) {
@@ -62,14 +61,14 @@ func (repository *MongoDBEcotourRepository) GetAll() ([]Ecotour, error) {
 	return ecotours, nil
 }
 
-func (repository *MongoDBEcotourRepository) Update(ecotour Ecotour) error {
+func (repository *MongoDBEcotourRepository) Update(ecotour Ecotour) (Ecotour, error) {
 	ecotourModel := FromEcotour(ecotour)
 	ecotourModel.UpdatedAt = time.Now()
 	_, err := repository.EcotoursCollection.ReplaceOne(context.TODO(), bson.M{"_id": ecotourModel.ID}, ecotour)
 	if err != nil {
-		return err
+		return Ecotour{}, err
 	}
-	return nil
+	return FromEcotourModel(ecotourModel), nil
 }
 
 func (repository *MongoDBEcotourRepository) Delete(id string) error {

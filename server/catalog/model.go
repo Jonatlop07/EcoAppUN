@@ -7,22 +7,22 @@ import (
 )
 
 type CatalogRecordModel struct {
-	ID             primitive.ObjectID `bson:"_id" json:"id" validate:"required"`
-	AuthorID       primitive.ObjectID `bson:"authorId" json:"author_id" validate:"required"`
-	CreatedAt      time.Time          `bson:"createdAt" json:"created_at" validate:"required"`
-	UpdatedAt      time.Time          `bson:"updatedAt" json:"updated_at" validate:"required"`
-	CommonName     string             `bson:"commonName" json:"common_name" validate:"required"`
-	ScientificName string             `bson:"scientificName" json:"scientific_name" validate:"required"`
-	Description    string             `bson:"description" json:"description" validate:"required"`
-	Locations      []string           `bson:"locations" json:"locations" validate:"required"`
-	Images         []ImageModel       `bson:"images" json:"images" validate:"required"`
+	ID             primitive.ObjectID `bson:"_id" validate:"required"`
+	AuthorID       primitive.ObjectID `bson:"authorId" validate:"required"`
+	CreatedAt      time.Time          `bson:"createdAt" validate:"required"`
+	UpdatedAt      time.Time          `bson:"updatedAt" validate:"required"`
+	CommonName     string             `bson:"commonName" validate:"required"`
+	ScientificName string             `bson:"scientificName" validate:"required"`
+	Description    string             `bson:"description" validate:"required"`
+	Locations      []string           `bson:"locations" validate:"required"`
+	Images         []ImageModel       `bson:"images" validate:"required"`
 }
 
 type ImageModel struct {
-	ID          primitive.ObjectID `bson:"_id" json:"id" validate:"required"`
-	AuthorID    primitive.ObjectID `bson:"authorId" json:"author_id" validate:"required"`
-	AuthorName  string             `bson:"authorName" json:"author_name" validate:"required"`
-	Description string             `bson:"description" json:"description" validate:"required"`
-	SubmitedAt  time.Time          `bson:"submited" json:"submited_at" validate:"required"`
-	URL         string             `bson:"url" json:"url" validate:"required"`
+	ID          primitive.ObjectID `bson:"_id" validate:"required"`
+	AuthorID    primitive.ObjectID `bson:"authorId" validate:"required"`
+	AuthorName  string             `bson:"authorName" validate:"required"`
+	Description string             `bson:"description" validate:"required"`
+	SubmitedAt  time.Time          `bson:"submited" validate:"required"`
+	URL         string             `bson:"url" validate:"required"`
 }

@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -15,6 +16,11 @@ type BlogController struct {
 func (c *BlogController) CreateArticle(ctx *gin.Context) {
 	var articleDetails ArticleDetails
 	if err := ctx.ShouldBindJSON(&articleDetails); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	validate := validator.New()
+	if err := validate.Struct(articleDetails); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
@@ -63,13 +69,16 @@ func (c *BlogController) GetAllArticles(ctx *gin.Context) {
 }
 
 func (c *BlogController) UpdateArticle(ctx *gin.Context) {
-	id := ctx.Param("id")
 	var article Article
 	if err := ctx.ShouldBindJSON(&article); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	article.ID = id
+	validate := validator.New()
+	if err := validate.Struct(article); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
 	updatedArticle, err := c.Gateway.Update(article)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -95,12 +104,17 @@ func (c *BlogController) AddReactionToArticle(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	err := c.Gateway.AddReaction(articleID, reactionDetails)
+	validate := validator.New()
+	if err := validate.Struct(reactionDetails); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	addedReaction, err := c.Gateway.AddReaction(articleID, reactionDetails)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	ctx.JSON(http.StatusOK, gin.H{"message": "Reaction added successfully"})
+	ctx.JSON(http.StatusOK, gin.H{"reaction": addedReaction})
 }
 
 func (controller *BlogController) RemoveReactionFromArticle(ctx *gin.Context) {
@@ -111,7 +125,6 @@ func (controller *BlogController) RemoveReactionFromArticle(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-
 	ctx.JSON(http.StatusOK, gin.H{"message": "Reaction removed successfully"})
 }
 
@@ -119,6 +132,11 @@ func (c *BlogController) CreateArticleComment(ctx *gin.Context) {
 	articleID := ctx.Param("id")
 	var commentDetails CommentDetails
 	if err := ctx.ShouldBindJSON(&commentDetails); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	validate := validator.New()
+	if err := validate.Struct(commentDetails); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
@@ -145,24 +163,40 @@ func (controller *BlogController) AddReactionToComment(ctx *gin.Context) {
 	articleID := ctx.Param("id")
 	commentID := ctx.Param("comment_id")
 	var reactionDetails CommentReactionDetails
+	idx := CommentIdentifiersDTO{ArticleID: articleID, CommentID: commentID}
 	if err := ctx.ShouldBindJSON(&reactionDetails); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	err := controller.Gateway.AddReactionToComment(CommentIdentifiersDTO{ArticleID: articleID, CommentID: commentID}, reactionDetails)
+	validate := validator.New()
+	if err := validate.Struct(reactionDetails); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	if err := validate.Struct(idx); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	addedReaction, err := controller.Gateway.AddReactionToComment(idx, reactionDetails)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	ctx.JSON(http.StatusOK, gin.H{"message": "Reaction added to comment successfully"})
+	ctx.JSON(http.StatusOK, gin.H{"reaction": addedReaction})
 }
 
 func (controller *BlogController) RemoveReactionFromComment(ctx *gin.Context) {
 	articleID := ctx.Param("id")
 	commentID := ctx.Param("comment_id")
 	authorID := ctx.Param("author_id")
+	idx := CommentIdentifiersDTO{ArticleID: articleID, CommentID: commentID}
+	validate := validator.New()
+	if err := validate.Struct(idx); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
 	err := controller.Gateway.RemoveReactionFromComment(
-		CommentIdentifiersDTO{ArticleID: articleID, CommentID: commentID},
+		idx,
 		authorID,
 	)
 	if err != nil {

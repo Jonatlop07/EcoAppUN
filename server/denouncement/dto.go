@@ -37,20 +37,20 @@ type ResponseReactionDetails struct {
 }
 
 type CommentIdentifiersDTO struct {
-	DenouncementID string
-	CommentID      string
+	DenouncementID string `validate:"required"`
+	CommentID      string `validate:"required"`
 }
 
 type CommentReactionIdentifiersDTO struct {
-	DenouncementID string
-	CommentID      string
-	AuthorID       string
+	DenouncementID string `validate:"required"`
+	CommentID      string `validate:"required"`
+	AuthorID       string `validate:"required"`
 }
 
 type ResponseIdentifiersDTO struct {
-	DenouncementID string
-	CommentID      string
-	ResponseID     string
+	DenouncementID string `validate:"required"`
+	CommentID      string `validate:"required"`
+	ResponseID     string `validate:"required"`
 }
 
 type ResponseReactionIdentifiersDTO struct {

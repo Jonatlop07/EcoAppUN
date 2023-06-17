@@ -23,6 +23,6 @@ type CommentReactionDetails struct {
 }
 
 type CommentIdentifiersDTO struct {
-	ArticleID string
-	CommentID string
+	ArticleID string `validate:"required"`
+	CommentID string `validate:"required"`
 }
