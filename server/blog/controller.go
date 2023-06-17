@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type BlogController struct {
@@ -12,49 +13,44 @@ type BlogController struct {
 }
 
 func (c *BlogController) CreateArticle(ctx *gin.Context) {
-	var article Article
-	if err := ctx.ShouldBindJSON(&article); err != nil {
+	var articleDetails ArticleDetails
+	if err := ctx.ShouldBindJSON(&articleDetails); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	err := c.Gateway.Create(&article)
+	createdArticle, err := c.Gateway.Create(articleDetails)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	ctx.JSON(http.StatusOK, article)
+	ctx.JSON(http.StatusOK, gin.H{"article_id": createdArticle.ID})
 }
 
 func (c *BlogController) GetArticleByID(ctx *gin.Context) {
 	id := ctx.Param("id")
 	article, err := c.Gateway.GetByID(id)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		if err == mongo.ErrNoDocuments {
+			ctx.JSON(http.StatusNotFound, gin.H{"error": "Article not found"})
+		} else {
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		}
 		return
 	}
-	if article == nil {
-		ctx.JSON(http.StatusNotFound, gin.H{"error": "Article not found"})
-		return
-	}
-	ctx.JSON(http.StatusOK, article)
+	ctx.JSON(http.StatusOK, gin.H{"article": article})
 }
 
 func (c *BlogController) GetAllArticles(ctx *gin.Context) {
 	var filter struct {
-		ID         string    `form:"id"`
 		Categories []string  `form:"categories"`
-		CreatedAt  time.Time `form:"createdAt" time_format:"2006-01-02"`
+		CreatedAt  time.Time `form:"created_at"`
 		Title      string    `form:"title"`
 	}
 	if err := ctx.ShouldBindQuery(&filter); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	if filter.CreatedAt.IsZero() {
-		filter.CreatedAt = time.Now()
-	}
-	articles, err := c.Gateway.GetAll(&BlogFilter{
-		ID:         filter.ID,
+	articles, err := c.Gateway.GetAll(BlogFilter{
 		Categories: filter.Categories,
 		CreatedAt:  filter.CreatedAt,
 		Title:      filter.Title,
@@ -63,7 +59,7 @@ func (c *BlogController) GetAllArticles(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	ctx.JSON(http.StatusOK, articles)
+	ctx.JSON(http.StatusOK, gin.H{"articles": articles})
 }
 
 func (c *BlogController) UpdateArticle(ctx *gin.Context) {
@@ -74,12 +70,12 @@ func (c *BlogController) UpdateArticle(ctx *gin.Context) {
 		return
 	}
 	article.ID = id
-	err := c.Gateway.Update(&article)
+	updatedArticle, err := c.Gateway.Update(article)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	ctx.JSON(http.StatusOK, article)
+	ctx.JSON(http.StatusOK, gin.H{"article_id": updatedArticle.ID})
 }
 
 func (c *BlogController) DeleteArticle(ctx *gin.Context) {
@@ -89,18 +85,17 @@ func (c *BlogController) DeleteArticle(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	ctx.JSON(http.StatusOK, gin.H{"message": "Article deleted successfully"})
+	ctx.Status(http.StatusNoContent)
 }
 
 func (c *BlogController) AddReactionToArticle(ctx *gin.Context) {
 	articleID := ctx.Param("id")
-	var reaction ArticleReaction
-	if err := ctx.ShouldBindJSON(&reaction); err != nil {
+	var reactionDetails ArticleReactionDetails
+	if err := ctx.ShouldBindJSON(&reactionDetails); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	reaction.ArticleID = articleID
-	err := c.Gateway.AddReaction(&reaction)
+	err := c.Gateway.AddReaction(articleID, reactionDetails)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -110,9 +105,8 @@ func (c *BlogController) AddReactionToArticle(ctx *gin.Context) {
 
 func (controller *BlogController) RemoveReactionFromArticle(ctx *gin.Context) {
 	articleID := ctx.Param("id")
-	userID := ctx.Param("user_id")
-
-	err := controller.Gateway.RemoveReaction(articleID, userID)
+	authorID := ctx.Param("author_id")
+	err := controller.Gateway.RemoveReaction(articleID, authorID)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -123,18 +117,17 @@ func (controller *BlogController) RemoveReactionFromArticle(ctx *gin.Context) {
 
 func (c *BlogController) CreateArticleComment(ctx *gin.Context) {
 	articleID := ctx.Param("id")
-	var comment Comment
-	if err := ctx.ShouldBindJSON(&comment); err != nil {
+	var commentDetails CommentDetails
+	if err := ctx.ShouldBindJSON(&commentDetails); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	comment.ArticleID = articleID
-	err := c.Gateway.CreateComment(&comment)
+	createdComment, err := c.Gateway.CreateComment(articleID, commentDetails)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	ctx.JSON(http.StatusOK, comment)
+	ctx.JSON(http.StatusOK, gin.H{"comment_id": createdComment.ID})
 }
 
 func (controller *BlogController) DeleteArticleComment(ctx *gin.Context) {
@@ -151,14 +144,12 @@ func (controller *BlogController) DeleteArticleComment(ctx *gin.Context) {
 func (controller *BlogController) AddReactionToComment(ctx *gin.Context) {
 	articleID := ctx.Param("id")
 	commentID := ctx.Param("comment_id")
-	var reaction CommentReaction
-	reaction.ArticleID = articleID
-	reaction.CommentID = commentID
-	if err := ctx.ShouldBindJSON(&reaction); err != nil {
+	var reactionDetails CommentReactionDetails
+	if err := ctx.ShouldBindJSON(&reactionDetails); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	err := controller.Gateway.AddReactionToComment(&reaction)
+	err := controller.Gateway.AddReactionToComment(CommentIdentifiersDTO{ArticleID: articleID, CommentID: commentID}, reactionDetails)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -169,8 +160,11 @@ func (controller *BlogController) AddReactionToComment(ctx *gin.Context) {
 func (controller *BlogController) RemoveReactionFromComment(ctx *gin.Context) {
 	articleID := ctx.Param("id")
 	commentID := ctx.Param("comment_id")
-	userID := ctx.Param("user_id")
-	err := controller.Gateway.RemoveReactionFromComment(articleID, commentID, userID)
+	authorID := ctx.Param("author_id")
+	err := controller.Gateway.RemoveReactionFromComment(
+		CommentIdentifiersDTO{ArticleID: articleID, CommentID: commentID},
+		authorID,
+	)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

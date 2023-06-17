@@ -31,6 +31,8 @@ class CreateDenouncementController extends StateNotifier<CreateDenouncementState
       denouncerId: _currentUser!.id,
       title: input.title,
       description: input.description,
+      initialDate: input.initialDate,
+      finalDate: input.finalDate,
       multimediaElements: input.multimediaElements
           .map(
             (multimediaElement) => MultimediaDetails(

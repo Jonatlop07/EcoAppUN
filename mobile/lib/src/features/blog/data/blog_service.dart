@@ -1,20 +1,21 @@
 import 'package:dio/dio.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mobile/src/features/blog/data/article_details.dart';
 import 'package:mobile/src/features/blog/data/blog_filter.dart';
 
 import '../domain/blog.dart';
+import '../presentation/edit_article/article_edit_details.input.dart';
 
 class BlogService {
   final Dio _dio;
-  final String _baseUrl;
+  final String _baseUrl = 'http://localhost:8083';
 
-  BlogService()
-      : _dio = Dio(),
-        _baseUrl = 'https://your-api-url.com';
+  BlogService() : _dio = Dio();
 
-  Future<void> createArticle(Article article) async {
+  Future<String> createArticle(ArticleDetails articleDetails) async {
     try {
-      final response = await _dio.post('$_baseUrl/articles', data: article.toJson());
-      // Handle response as needed
+      final response = await _dio.post('$_baseUrl/articles', data: articleDetails.toJson());
+      return response.data['article_id'];
     } catch (e) {
       throw Exception('Failed to create article. Error: $e');
     }
@@ -31,21 +32,24 @@ class BlogService {
     }
   }
 
-  Future<List<Article>> getAllArticles(BlogFilter filter) async {
+  Future<List<Article>> getAllArticles(BlogFilter? filter) async {
     try {
-      final params = filter.toJson();
+      final params = filter != null ? filter.toJson() : <String, dynamic>{};
       final response = await _dio.get('$_baseUrl/articles', queryParameters: params);
-      final articles =
-          List<Article>.from((response.data as List).map((article) => Article.fromJson(article)));
-      return articles;
+      return List<Article>.from(
+        response.data['articles'].map(
+          (article) => Article.fromJson(article),
+        ),
+      );
     } catch (e) {
       throw Exception('Failed to get articles by filter. Error: $e');
     }
   }
 
-  Future<void> updateArticle(Article article) async {
+  Future<String> updateArticle(ArticleEditDetailsInput article) async {
     try {
       final response = await _dio.put('$_baseUrl/articles/${article.id}', data: article.toJson());
+      return response.data['article_id'];
       // Handle response as needed
     } catch (e) {
       throw Exception('Failed to update article. Error: $e');
@@ -125,3 +129,11 @@ class BlogService {
     }
   }
 }
+
+final blogServiceProvider = Provider<BlogService>((ref) {
+  return BlogService();
+});
+
+final getAllArticlesProvider = FutureProvider<List<Article>>((ref) {
+  return ref.read(blogServiceProvider).getAllArticles(null);
+});

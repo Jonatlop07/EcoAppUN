@@ -96,6 +96,8 @@ class _CreateDenouncementFormState extends ConsumerState<_CreateDenouncementForm
         DenouncementDetailsInput(
           title: title,
           description: description,
+          initialDate: _initialDate,
+          finalDate: _finalDate,
           multimediaElements: _multimediaElements
               .map(
                 (multimediaElement) => MultimediaEditDetailsInput(

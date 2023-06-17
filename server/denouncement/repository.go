@@ -52,7 +52,7 @@ func (r *MongoDBDenouncementRepository) Update(denouncement Denouncement) error 
 	if err != nil {
 		return err
 	}
-	return err
+	return nil
 }
 
 func (r *MongoDBDenouncementRepository) Delete(id string) error {
@@ -79,12 +79,12 @@ func (r *MongoDBDenouncementRepository) GetByID(id string) (*Denouncement, error
 }
 
 func (r *MongoDBDenouncementRepository) GetAll() ([]Denouncement, error) {
-	var denouncements []Denouncement
 	cur, err := r.DenouncementsCollection.Find(context.TODO(), bson.M{})
 	if err != nil {
 		return nil, err
 	}
 	defer cur.Close(context.TODO())
+	var denouncements []Denouncement
 	if err = cur.All(context.TODO(), &denouncements); err != nil {
 		return nil, err
 	}

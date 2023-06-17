@@ -36,7 +36,6 @@ class CreateEcotourController extends StateNotifier<CreateEcotourState> {
       endTime: input.endTime,
       meetupPoint: input.meetupPoint,
       organizers: input.organizers,
-      instructions: input.instructions,
     );
     return await _createEcotour(ecotourDetails);
   }

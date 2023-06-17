@@ -1,9 +1,14 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mobile/src/features/blog/domain/blog.dart';
 import 'package:mobile/src/features/catalog/presentation/edit_catalog_record/edit_catalog_record.screen.dart';
 import 'package:mobile/src/features/sowing/domain/sowing.dart';
 import 'package:mobile/src/features/sowing/presentation/create_sowing_workshop/create_sowing_workshop.screen.dart';
+import '../../features/blog/presentation/article_query/article.screen.dart';
+import '../../features/blog/presentation/blog_query/blog.screen.dart';
+import '../../features/blog/presentation/create_article/create_article.screen.dart';
+import '../../features/blog/presentation/edit_article/edit_article.screen.dart';
 import '../../features/catalog/domain/catalog.dart';
 import '../../features/catalog/presentation/catalog_query/catalog.screen.dart';
 import '../../features/catalog/presentation/catalog_record_query/catalog_record.screen.dart';
@@ -21,7 +26,7 @@ import '../../features/ecorecovery/presentation/query_ecorecovery_workshop/ecore
 import '../../features/ecotour/domain/ecotour.dart';
 import '../../features/ecotour/presentation/create_ecotour/create_ecotour.screen.dart';
 import '../../features/ecotour/presentation/ecotours_feed/ecotours_feed.screen.dart';
-import '../../features/ecotour/presentation/edit_ecotour/edit_sowing_workshop.screen.dart';
+import '../../features/ecotour/presentation/edit_ecotour/edit_ecotour.screen.dart';
 import '../../features/ecotour/presentation/query_ecotour/ecotour.screen.dart';
 import '../../features/sowing/presentation/edit_sowing_workshop/edit_sowing_workshop.screen.dart';
 import '../../features/sowing/presentation/query_sowing_workshop/sowing_workshop.screen.dart';
@@ -36,6 +41,87 @@ final goRouterProvider = Provider<GoRouter>((ref) {
     debugLogDiagnostics: true,
     routes: [
       GoRoute(
+        path: '/',
+        name: Routes.blog,
+        pageBuilder: (context, state) => TransitionScreen.createFade(
+          context,
+          state,
+          BlogScreen(
+            onArticleSelected: (Article article) {
+              context.pushNamed(
+                Routes.queryArticle,
+                pathParameters: {"articleId": article.id},
+                extra: article.toJson(),
+              );
+            },
+            onEditArticle: (Article article) {
+              context.pushNamed(
+                Routes.editArticle,
+                pathParameters: {"articleId": article.id},
+                extra: article.toJson(),
+              );
+            },
+            onDeleteArticle: (String articleId) {
+              context.pushNamed(Routes.blog);
+            },
+            onCreateNewArticle: () {
+              context.pushNamed(Routes.createArticle);
+            },
+          ),
+        ),
+        routes: [
+          GoRoute(
+            path: 'create',
+            name: Routes.createArticle,
+            pageBuilder: (context, state) => TransitionScreen.createFade(
+              context,
+              state,
+              const CreateArticleScreen(),
+            ),
+          ),
+          GoRoute(
+            path: 'edit/:articleId',
+            name: Routes.editArticle,
+            pageBuilder: (context, state) {
+              final data = state.extra as Map<String, dynamic>;
+              Article article = Article.fromJson(data);
+              return TransitionScreen.createFade(
+                context,
+                state,
+                EditArticleScreen(
+                  article: article,
+                ),
+              );
+            },
+          ),
+          GoRoute(
+            path: ':articleId',
+            name: Routes.queryArticle,
+            pageBuilder: (context, state) {
+              final data = state.extra as Map<String, dynamic>;
+              Article article = Article.fromJson(data);
+              return TransitionScreen.createFade(
+                context,
+                state,
+                ArticleScreen(
+                  article: article,
+                  onEditArticle: (Article article) {
+                    context.pushNamed(
+                      Routes.editArticle,
+                      pathParameters: {"articleId": article.id},
+                      extra: article.toJson(),
+                    );
+                  },
+                  onDeleteArticle: (String articleId) {
+                    context.pushNamed(Routes.blog);
+                  },
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+      /*GoRoute(
         path: '/',
         name: Routes.denouncements,
         pageBuilder: (context, state) => TransitionScreen.createFade(
@@ -115,7 +201,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             },
           ),
         ],
-      ),
+      ),*/
       /*GoRoute(
         path: '/',
         name: Routes.ecotours,

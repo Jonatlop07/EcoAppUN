@@ -20,4 +20,8 @@ class Routes {
   static const queryDenouncement = 'queryDenouncement';
   static const createDenouncement = 'createDenouncement';
   static const editDenouncement = 'editDenouncement';
+  static const blog = 'blog';
+  static const queryArticle = 'queryArticle';
+  static const createArticle = 'createArticle';
+  static const editArticle = 'editArticle';
 }

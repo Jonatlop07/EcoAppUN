@@ -13,7 +13,6 @@ class CatalogService {
       final response =
           await _dio.post('$baseUrl/catalog-records', data: catalogRecordDetails.toJson());
       return response.data['catalog_record_id'];
-      // Handle response as needed
     } catch (e) {
       throw Exception('Failed to create catalog record. Error: $e');
     }

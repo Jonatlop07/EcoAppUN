@@ -20,10 +20,10 @@ class CustomDatePicker extends StatefulWidget {
   final String label;
 
   @override
-  State<StatefulWidget> createState() => _MyDatePickerState();
+  State<StatefulWidget> createState() => _CustomDatePickerState();
 }
 
-class _MyDatePickerState extends State<CustomDatePicker> {
+class _CustomDatePickerState extends State<CustomDatePicker> {
   late DateTime selectedDate;
 
   @override

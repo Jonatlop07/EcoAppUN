@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile/src/shared/common_widgets/navbar.dart';
 import 'package:mobile/src/shared/constants/app.sizes.dart';
-import 'package:mobile/src/shared/localization/string.hardcoded.dart';
 import '../../../../shared/async/async_value_ui.dart';
 import '../../../../shared/common_widgets/done_button.dart';
 import '../../../../shared/common_widgets/input_list.dart';
@@ -30,7 +29,7 @@ class CreateCatalogRecordScreen extends StatelessWidget {
     return Scaffold(
       appBar: const NavBar(),
       body: _CreateCatalogRecordForm(
-        onCatalogRecordCreated: (catalogId) => context.pushNamed(Routes.catalog),
+        onCatalogRecordCreated: (catalogRecordId) => context.pushNamed(Routes.catalog),
       ),
     );
   }
@@ -101,8 +100,8 @@ class _CreateCatalogRecordFormState extends ConsumerState<_CreateCatalogRecordFo
         ),
       );
       if (success) {
-        String catalogId = state.value as String;
-        widget.onCatalogRecordCreated.call(catalogId);
+        String catalogRecordId = state.value as String;
+        widget.onCatalogRecordCreated.call(catalogRecordId);
       }
     }
   }

@@ -8,7 +8,6 @@ class EcotourDetailsInput {
   final String description;
   final String meetupPoint;
   final List<String> organizers;
-  final List<String> instructions;
 
   EcotourDetailsInput({
     required this.title,
@@ -18,6 +17,5 @@ class EcotourDetailsInput {
     required this.description,
     required this.meetupPoint,
     required this.organizers,
-    required this.instructions,
   });
 }

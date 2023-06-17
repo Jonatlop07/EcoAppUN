@@ -9,7 +9,6 @@ class EcotourDetails {
   final String description;
   final String meetupPoint;
   final List<String> organizers;
-  final List<String> instructions;
 
   EcotourDetails({
     required this.authorId,
@@ -20,7 +19,6 @@ class EcotourDetails {
     required this.description,
     required this.meetupPoint,
     required this.organizers,
-    required this.instructions,
   });
 
   Map<String, dynamic> toJson() {
@@ -47,7 +45,6 @@ class EcotourDetails {
       'description': description,
       'meetup_point': meetupPoint,
       'organizers': organizers,
-      'instructions': instructions,
     };
   }
 }

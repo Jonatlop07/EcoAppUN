@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile/src/shared/constants/app.sizes.dart';
 import '../../../../shared/common_widgets/navbar.dart';
-import '../../../../shared/localization/string.hardcoded.dart';
 import '../../../../shared/async/async_value_ui.dart';
 import '../../../../shared/common_widgets/done_button.dart';
 import '../../../../shared/common_widgets/responsive_scrollable_card.dart';

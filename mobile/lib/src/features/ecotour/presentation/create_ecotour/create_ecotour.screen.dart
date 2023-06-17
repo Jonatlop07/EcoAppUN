@@ -72,7 +72,6 @@ class _CreateEcotourFormState extends ConsumerState<_CreateEcotourForm> {
   String _meetupPoint = '';
 
   List<String> _organizers = [];
-  List<String> _instructions = [];
 
   var _submitted = false;
 
@@ -104,10 +103,6 @@ class _CreateEcotourFormState extends ConsumerState<_CreateEcotourForm> {
     _meetupPoint = meetupPoint;
   }
 
-  void _handleOnChangeInstructions(List<String> instructions) {
-    _instructions = instructions;
-  }
-
   void _handleOnChangeOrganizers(List<String> organizers) {
     _organizers = organizers;
   }
@@ -124,7 +119,6 @@ class _CreateEcotourFormState extends ConsumerState<_CreateEcotourForm> {
           startTime: _startTime,
           endTime: _endTime,
           meetupPoint: _meetupPoint,
-          instructions: _instructions,
           organizers: _organizers,
         ),
       );

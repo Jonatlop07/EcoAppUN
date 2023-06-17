@@ -9,17 +9,19 @@ class SecondaryIconButton extends StatelessWidget {
     required this.icon,
     this.isLoading = false,
     this.onPressed,
+    this.height,
   }) : super(key: key);
 
   final String text;
   final bool isLoading;
   final VoidCallback? onPressed;
   final Icon icon;
+  final double? height;
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: Sizes.p48,
+      height: height ?? Sizes.p48,
       child: isLoading
           ? const CircularProgressIndicator()
           : OutlinedButton.icon(

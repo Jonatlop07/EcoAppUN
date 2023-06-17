@@ -2,12 +2,16 @@ class DenouncementDetails {
   final String denouncerId;
   final String title;
   final String description;
+  final DateTime initialDate;
+  final DateTime finalDate;
   final List<MultimediaDetails> multimediaElements;
 
   DenouncementDetails({
     required this.denouncerId,
     required this.title,
     required this.description,
+    required this.initialDate,
+    required this.finalDate,
     required this.multimediaElements,
   });
 
@@ -16,6 +20,8 @@ class DenouncementDetails {
       'denouncer_id': denouncerId,
       'title': title,
       'description': description,
+      'initial_date': initialDate.toIso8601String(),
+      'final_date': finalDate.toIso8601String(),
       'multimedia_elements': multimediaElements
           .map(
             (multimediaElement) => multimediaElement.toJson(),

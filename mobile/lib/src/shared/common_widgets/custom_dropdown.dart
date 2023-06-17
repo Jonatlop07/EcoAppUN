@@ -8,12 +8,14 @@ class CustomDropdown extends StatefulWidget {
     this.initialOptionIndex,
     required this.options,
     this.onSelected,
+    this.trailing,
   }) : super(key: key);
 
   final String label;
   final int? initialOptionIndex;
   final List<String> options;
   final Function(String)? onSelected;
+  final Widget? trailing;
 
   @override
   State<StatefulWidget> createState() => _CustomDropdownState();
@@ -60,16 +62,22 @@ class _CustomDropdownState extends State<CustomDropdown> {
             style: Theme.of(context).textTheme.labelMedium,
           ),
           gapH8,
-          DropdownButton(
-            value: selectedOption,
-            items: widget.options.map((String option) {
-              return DropdownMenuItem(
-                value: option,
-                child: Text(option),
-              );
-            }).toList(),
-            style: Theme.of(context).textTheme.bodyMedium,
-            onChanged: handleOnChange,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              DropdownButton(
+                value: selectedOption,
+                items: widget.options.map((String option) {
+                  return DropdownMenuItem(
+                    value: option,
+                    child: Text(option),
+                  );
+                }).toList(),
+                style: Theme.of(context).textTheme.bodyMedium,
+                onChanged: handleOnChange,
+              ),
+              widget.trailing ?? Column()
+            ],
           ),
         ],
       ),

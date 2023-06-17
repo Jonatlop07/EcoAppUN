@@ -83,7 +83,6 @@ class _EditEcotourFormState extends ConsumerState<_EditEcotourForm> {
   String _meetupPoint = '';
 
   List<String> _organizers = [];
-  List<String> _instructions = [];
 
   var _submitted = false;
 
@@ -135,10 +134,6 @@ class _EditEcotourFormState extends ConsumerState<_EditEcotourForm> {
 
   void _handleOnSelectMeetupPoint(String meetupPoint) {
     _meetupPoint = meetupPoint;
-  }
-
-  void _handleOnChangeInstructions(List<String> instructions) {
-    _instructions = instructions;
   }
 
   void _handleOnChangeOrganizers(List<String> organizers) {
